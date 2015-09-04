@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o errexit
+#set -o errexit
 
 echo "Removing exited docker containers..."
 docker ps -a -f status=exited -q | xargs -r docker rm -v
@@ -23,5 +23,5 @@ done
 
 remove_images=" ${remove[*]} "
 
-echo ${remove_images} | xargs -r docker rmi
+echo ${remove_images} | xargs -r docker rmi 
 echo "Done"
