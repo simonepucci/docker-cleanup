@@ -52,8 +52,10 @@ for item in ${images[@]}; do
   fi
 done
 
-remove_images=" ${remove[*]} "
-
-echo ${remove_images} | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting unused images, check the logs for details."
+if [ ${#remove[@]} -gt 0 ];
+then
+    remove_images=" ${remove[*]} "
+    echo ${remove_images} | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting unused images, check the logs for details."
+fi
 
 echo "Done"
