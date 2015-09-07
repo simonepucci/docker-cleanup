@@ -1,0 +1,3 @@
+[submodule "docker-cleanup-volumes"]
+	path = docker-cleanup-volumes
+	url = https://github.com/chadoe/docker-cleanup-volumes.git
