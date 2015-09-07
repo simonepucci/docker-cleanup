@@ -6,6 +6,7 @@ set -eou pipefail
 dryrun=false
 verbose=false
 docker_bin=$(which docker.io 2> /dev/null || which docker 2> /dev/null)
+docker_bin_safe=${docker_bin}
 
 if [ -z "$docker_bin" ] ; then
     echo "Please install docker. You can install docker by running \"wget -qO- https://get.docker.io/ | sh\"."
@@ -30,7 +31,7 @@ do
     shift
 done
 
-[ "${dryrun}" = true ] && docker_bin=echo
+[ "${dryrun}" = true ] && docker_bin="echo docker"
 
 echo "Removing exited docker containers..."
 ${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v
@@ -39,8 +40,8 @@ echo "Removing dangling images..."
 ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi
 
 echo "Removing unused docker images"
-images=($(${docker_bin} images | tail -n +2 | awk '{print $1":"$2}'))
-containers=($(${docker_bin} ps -a | tail -n +2 | awk '{print $2}'))
+images=($(${docker_bin_safe} images | tail -n +2 | awk '{print $1":"$2}'))
+containers=($(${docker_bin_safe} ps -a | tail -n +2 | awk '{print $2}'))
 
 containers_reg=" ${containers[*]} "
 remove=()
