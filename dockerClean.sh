@@ -36,9 +36,14 @@ echo
 echo "Removing exited docker containers..."
 if [ "${dryrun}" == true ];
 then
-    ${docker_bin} ps -a -f status=exited -q | xargs -r echo "The following docker containers would be deleted:"
+    ${docker_bin} ps -a -f status=exited -q | xargs -r echo "The following docker containers would be deleted: "
 else
-    ${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v || echo "Some errors happened while deleting exited containers, check the logs for details."
+    #${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v || echo "Some errors happened while deleting exited containers, check the logs for details."
+    ${docker_bin} ps -a -f status=exited -q | while read line;
+    do
+        echo "Deleting docker container: ${line}";
+        ${docker_bin} rm -v ${line} || echo "Some errors happened while deleting exited container: ${line}.";
+    done
 fi
 
 echo "Removing dangling images..."
@@ -46,7 +51,12 @@ if [ "${dryrun}" == true ];
 then
     ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r echo "The following dangling images would be deleted: "
 else
-    ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting dangling images, check the logs for details."
+    #${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting dangling images, check the logs for details."
+    ${docker_bin} images --no-trunc -q -f dangling=true | while read line;
+    do
+        echo "Deleting docker dangling image: ${line}";
+        ${docker_bin} rmi ${line} || echo "Some errors happened while deleting dangling image: ${line}.";
+    done
 fi
 
 echo "Removing unused docker images..."
@@ -59,6 +69,10 @@ remove=()
 for item in ${images[@]}; do
   if [[ ! $containers_reg =~ " $item " ]]; then
     remove+=($item)
+    if [ "${dryrun}" == false -a ! -z "${item}" ];
+        echo "Deleting docker unused image: ${line}";
+        ${docker_bin} rmi ${item} || echo "Some errors happened while deleting unused image: ${item}, check the logs for details.";
+    fi
   fi
 done
 
@@ -68,8 +82,6 @@ then
     if [ "${dryrun}" == true ];
     then
         echo ${remove_images} | xargs -r echo "The following unused images would be deleted: "
-    else
-        echo ${remove_images} | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting unused images, check the logs for details."
     fi
 fi
 
