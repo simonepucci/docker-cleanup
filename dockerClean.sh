@@ -70,6 +70,7 @@ for item in ${images[@]}; do
   if [[ ! $containers_reg =~ " $item " ]]; then
     remove+=($item)
     if [ "${dryrun}" == false -a ! -z "${item}" ];
+    then
         echo "Deleting docker unused image: ${line}";
         ${docker_bin} rmi ${item} || echo "Some errors happened while deleting unused image: ${item}, check the logs for details.";
     fi
