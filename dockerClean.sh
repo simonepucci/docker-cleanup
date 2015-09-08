@@ -38,7 +38,7 @@ if [ "${dryrun}" == true ];
 then
     ${docker_bin} ps -a -f status=exited -q | xargs -r echo "The following docker containers would be deleted:"
 else
-    ${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v
+    ${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v || echo "Some errors happened while deleting exited containers, check the logs for details."
 fi
 
 echo "Removing dangling images..."
@@ -46,7 +46,7 @@ if [ "${dryrun}" == true ];
 then
     ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r echo "The following dangling images would be deleted: "
 else
-    ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi
+    ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting dangling images, check the logs for details."
 fi
 
 echo "Removing unused docker images..."
