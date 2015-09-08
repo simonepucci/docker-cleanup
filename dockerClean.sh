@@ -31,9 +31,9 @@ do
     shift
 done
 
-[ "${dryrun}" = true ] && docker_bin="echo docker"
+[ "${dryrun}" == true ] && docker_bin="echo docker"
 
-[ "${dryrun}" = true ] && /tmp/docker-cleanup/docker-cleanup-volumes.sh --dry-run || /tmp/docker-cleanup/docker-cleanup-volumes.sh
+[ "${dryrun}" == true ] && /tmp/docker-cleanup/docker-cleanup-volumes.sh --dry-run || /tmp/docker-cleanup/docker-cleanup-volumes.sh
 
 echo "Removing exited docker containers..."
 ${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v

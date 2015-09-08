@@ -24,7 +24,7 @@ dryrun=false
 verbose=false
 
 function log_verbose() {
-    if [ "${verbose}" = true ]; then
+    if [ "${verbose}" == true ]; then
         echo "$1"
     fi;
 }
@@ -44,7 +44,7 @@ function delete_volumes() {
                 if [ ${#allvolumes[@]} -gt 0 ] && [[ ${allvolumes[@]} =~ "${dir}" ]]; then
                         echo In use ${dir}
                 else
-                        if [ "${dryrun}" = false ]; then
+                        if [ "${dryrun}" == false ]; then
                                 echo Deleting ${dir}
                                 rm -rf ${targetdir}/${dir}
                         else
