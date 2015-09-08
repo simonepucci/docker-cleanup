@@ -32,6 +32,7 @@ done
 
 [ "${dryrun}" == true ] && /tmp/docker-cleanup/docker-cleanup-volumes.sh --dry-run || /tmp/docker-cleanup/docker-cleanup-volumes.sh
 
+echo
 echo "Removing exited docker containers..."
 if [ "${dryrun}" == true ];
 then
