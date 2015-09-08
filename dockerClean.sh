@@ -35,8 +35,7 @@ done
 echo "Removing exited docker containers..."
 if [ "${dryrun}" == true ];
 then
-    echo "The following docker containers would be deleted:"
-    ${docker_bin} ps -a -f status=exited -q 
+    ${docker_bin} ps -a -f status=exited -q | xargs -r echo "The following docker containers would be deleted:"
 else
     ${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v
 fi
@@ -44,13 +43,12 @@ fi
 echo "Removing dangling images..."
 if [ "${dryrun}" == true ];
 then
-    echo "The following dangling images would be deleted:"
-    ${docker_bin} images --no-trunc -q -f dangling=true
+    ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r echo "The following dangling images would be deleted: "
 else
     ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi
 fi
 
-echo "Removing unused docker images"
+echo "Removing unused docker images..."
 images=($(${docker_bin} images | tail -n +2 | awk '{print $1":"$2}'))
 containers=($(${docker_bin} ps -a | tail -n +2 | awk '{print $2}'))
 
@@ -68,8 +66,7 @@ then
     remove_images=" ${remove[*]} "
     if [ "${dryrun}" == true ];
     then
-        echo "The following unused images would be deleted:"
-        echo ${remove_images}
+        echo ${remove_images} | xargs -r echo "The following unused images would be deleted: "
     else
         echo ${remove_images} | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting unused images, check the logs for details."
     fi
