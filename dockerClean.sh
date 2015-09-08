@@ -6,7 +6,6 @@ set -eou pipefail
 dryrun=false
 verbose=false
 docker_bin=$(which docker.io 2> /dev/null || which docker 2> /dev/null)
-docker_bin_safe=${docker_bin}
 
 if [ -z "$docker_bin" ] ; then
     echo "Please install docker. You can install docker by running \"wget -qO- https://get.docker.io/ | sh\"."
@@ -31,19 +30,29 @@ do
     shift
 done
 
-[ "${dryrun}" == true ] && docker_bin="echo docker"
-
 [ "${dryrun}" == true ] && /tmp/docker-cleanup/docker-cleanup-volumes.sh --dry-run || /tmp/docker-cleanup/docker-cleanup-volumes.sh
 
 echo "Removing exited docker containers..."
-${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v
+if [ "${dryrun}" == true ];
+then
+    echo "The following docker containers would be deleted:"
+    ${docker_bin} ps -a -f status=exited -q 
+else
+    ${docker_bin} ps -a -f status=exited -q | xargs -r ${docker_bin} rm -v
+fi
 
 echo "Removing dangling images..."
-${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi
+if [ "${dryrun}" == true ];
+then
+    echo "The following dangling images would be deleted:"
+    ${docker_bin} images --no-trunc -q -f dangling=true
+else
+    ${docker_bin} images --no-trunc -q -f dangling=true | xargs -r ${docker_bin} rmi
+fi
 
 echo "Removing unused docker images"
-images=($(${docker_bin_safe} images | tail -n +2 | awk '{print $1":"$2}'))
-containers=($(${docker_bin_safe} ps -a | tail -n +2 | awk '{print $2}'))
+images=($(${docker_bin} images | tail -n +2 | awk '{print $1":"$2}'))
+containers=($(${docker_bin} ps -a | tail -n +2 | awk '{print $2}'))
 
 containers_reg=" ${containers[*]} "
 remove=()
@@ -57,7 +66,13 @@ done
 if [ ${#remove[@]} -gt 0 ];
 then
     remove_images=" ${remove[*]} "
-    echo ${remove_images} | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting unused images, check the logs for details."
+    if [ "${dryrun}" == true ];
+    then
+        echo "The following unused images would be deleted:"
+        echo ${remove_images}
+    else
+        echo ${remove_images} | xargs -r ${docker_bin} rmi || echo "Some errors happened while deleting unused images, check the logs for details."
+    fi
 fi
 
 echo "Done"
