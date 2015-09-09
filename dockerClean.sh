@@ -88,11 +88,11 @@ cat ${ToBeCleanedImageIdList} | while read line;
 do
     if [ "${dryrun}" == true ];
     then
-        echo "The following unused images would be deleted: ";
+        echo -n "The following unused images would be deleted: ";
         grep ${line} ${ImageFullList} | awk '{print $2}';
     else
         echo "Deleting docker unused image: ${line}";
-        ${docker_bin} rmi ${line} || echo "Some errors happened while deleting dangling image: ${line}.";
+        ${docker_bin} rmi ${line} || echo "Some errors happened while deleting unused image: ${line}.";
     fi
 done
 
