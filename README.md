@@ -37,12 +37,16 @@ EOF
 ```
 
 ## loads the service and timer units
-fleetctl load docker-clean\@\*.service
-fleetctl load docker-clean\@\*.timer
+
+    fleetctl load docker-clean\@\*.service
+
+    fleetctl load docker-clean\@\*.timer
 
 ## starts the timer
-fleetctl start docker-clean\@\*.timer
+
+    fleetctl start docker-clean\@\*.timer
 
 ## check service and timer
-fleetctl list-units | grep "docker-clean"
+
+    fleetctl list-units | grep "docker-clean"
 
