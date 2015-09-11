@@ -1,8 +1,10 @@
 # docker-cleanup
 Script used in deis cluster to cleanup docker unused stuff
 
-## Run the script on docker physical machine
-## First create fleetctl configuration files, one per server
+    Run the script on docker physical machines
+
+## First create fleetctl service configuration files, one per server.
+
 ```
 cat >docker-clean\@1.service<<EOF
 [Unit]
@@ -21,10 +23,14 @@ ExecStart=/bin/sh -c '/tmp/docker-cleanup/dockerClean.sh'
 Conflicts=docker-clean@*.service
 EOF
 ```
-## Check the X-ConditionMachineOf value in docker-clean timer config file
+
+## Then create fleetctl timer configuration files, one per server.
+
+### Check the X-ConditionMachineOf value in docker-clean timer config file
     You have to match a different docker-clean service for each timer you create.
     For ex. on a 3 host cluster you will have 3 docker-clean\@X.timer
     For each of them a proper X-ConditionMachineOf=docker-clean@X.service must be set.
+
     The docker-clean\@X.service files do not require any modifications, the content is the same for all.
 
 ```
