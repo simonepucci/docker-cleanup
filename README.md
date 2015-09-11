@@ -1,9 +1,9 @@
 # docker-cleanup
-script used by deis to cleanup docker unused stuff
+Script used in deis cluster to cleanup docker unused stuff
 
-# Run the script on docker phisycal machine
-# First create fleetctl configuration files, one per server
-
+## Run the script on docker physical machine
+## First create fleetctl configuration files, one per server
+```
 cat >docker-clean\@1.service<<EOF
 [Unit]
 Description=Clean up disk space
@@ -20,9 +20,10 @@ ExecStart=/bin/sh -c '/tmp/docker-cleanup/dockerClean.sh'
 [X-Fleet]
 Conflicts=docker-clean@*.service
 EOF
-
+```
 # Check the X-ConditionMachineOf value in docker-clean timer config file, you have to match a different docker-clean service for each timer you create.
 
+```
 cat >docker-clean\@1.timer<<EOF
 [Unit]
 Description=Runs docker-clean.service every day 
@@ -33,15 +34,15 @@ OnCalendar=03:00:00
 [X-Fleet]
 X-ConditionMachineOf=docker-clean@1.service
 EOF
+```
 
-
-# loads the service and timer units
+## loads the service and timer units
 fleetctl load docker-clean\@*.service
 fleetctl load docker-clean\@*.timer
 
-# starts the timer
+## starts the timer
 fleetctl start docker-clean\@*.timer
 
-# check service and timer
+## check service and timer
 fleetctl list-units | grep "docker-clean"
 
