@@ -6,11 +6,14 @@ set -eou pipefail
 dryrun=false
 verbose=false
 docker_bin=$(which docker.io 2> /dev/null || which docker 2> /dev/null)
+logger_bin=$(which logger 2> /dev/null)
 
 if [ -z "$docker_bin" ] ; then
     echo "Please install docker. You can install docker by running \"wget -qO- https://get.docker.io/ | sh\"."
     exit 1
 fi
+
+[ -z "${logger_bin}" ] && logger_bin=echo || logger_bin="${logger_bin} -t \"${0##*/}\""
 
 while [[ $# > 0 ]]
 do
@@ -42,7 +45,7 @@ else
     ${docker_bin} ps -a -f status=exited -q | while read line;
     do
         echo "Deleting docker container: ${line}";
-        ${docker_bin} rm -v ${line} || echo "Some errors happened while deleting exited container: ${line}.";
+        ${docker_bin} rm -v ${line} && ${logger_bin} "Deleted docker container: ${line}" || echo "Some errors happened while deleting exited container: ${line}.";
     done
 fi
 
@@ -55,7 +58,7 @@ else
     ${docker_bin} images --no-trunc -q -f dangling=true | while read line;
     do
         echo "Deleting docker dangling image: ${line}";
-        ${docker_bin} rmi ${line} || echo "Some errors happened while deleting dangling image: ${line}.";
+        ${docker_bin} rmi ${line} && ${logger_bin} "Deleted docker dangling image: ${line}" || echo "Some errors happened while deleting dangling image: ${line}.";
     done
 fi
 
@@ -91,7 +94,7 @@ do
         grep ${line} ${ImageFullList} | awk '{print $2}' | xargs -r echo "The following unused images would be deleted:";
     else
         echo "Deleting docker unused image: ${line}";
-        ${docker_bin} rmi ${line} || echo "Some errors happened while deleting unused image: ${line}.";
+        ${docker_bin} rmi ${line} && ${logger_bin} "Deleted docker unused image: ${line}" || echo "Some errors happened while deleting unused image: ${line}.";
     fi
 done
 
