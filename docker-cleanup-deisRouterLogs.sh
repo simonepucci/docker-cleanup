@@ -22,12 +22,15 @@ if [ -z "$etcdctl_bin" ] ; then
     echo "No etcdctl binary found."
     exit 1
 fi
-
+PROGNAME=${0##*/}
 SERVER=$(etcdctl get /deis/logs/host)
 PORT=$(etcdctl get /deis/logs/port)
 PROTO=$(etcdctl get /deis/logs/protocol)
-
-[ -z "${logger_bin}" ] && logger_bin=echo || logger_bin="${logger_bin} --server ${SERVER} --port ${PORT} --${PROTO} -t \"${0##*/}\""
+[ -z ${SERVER} ] || LOGGEROPTS="--server ${SERVER}";
+[ -z ${PORT} ] || LOGGEROPTS="${LOGGEROPTS} --port ${PORT}";
+[ -z ${PROTO} ] || LOGGEROPTS="${LOGGEROPTS} --${PROTO}";
+[ -z ${PROGNAME} ] || LOGGEROPTS="${LOGGEROPTS} -t ${PROGNAME}";
+[ -z "${logger_bin}" ] && logger_bin=echo || logger_bin="${logger_bin} ${LOGGEROPTS}"
 
 while [[ $# > 0 ]]
 do
