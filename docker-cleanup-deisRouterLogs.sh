@@ -61,8 +61,8 @@ then
             echo "File to truncate: ${nginx_log_file}";
 	else
             echo "Truncating file: ${nginx_log_file}";
-            ${logger_bin} "Truncating file: ${nginx_log_file}";
-	    #> ${nginx_log_file}
+            ${logger_bin} "Truncated: ${nginx_log_file}";
+	    > ${nginx_log_file}
         fi
     else
 	echo "File nginx log: ${nginx_log_file}, not found."
