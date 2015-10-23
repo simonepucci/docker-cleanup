@@ -50,7 +50,7 @@ done
 # Make sure that we can talk to docker daemon. If we cannot, we fail here.
 ${docker_bin} info >/dev/null
 
-deis_rouer_id=$(${docker_bin} docker inspect deis-router | grep '"Id": ' | grep -Eo '[0-9a-f]{64}')
+deis_rouer_id=$(${docker_bin} inspect deis-router | grep '"Id": ' | grep -Eo '[0-9a-f]{64}')
 if [[ "${deis_rouer_id}" =~ [0-9a-f]{64} ]]; 
 then
     nginx_log_file=${containersdir}/${deis_rouer_id}/${deis_rouer_id}-json.log
