@@ -98,31 +98,7 @@ do
     fi
 done
 
-
-#images=($(${docker_bin} images | tail -n +2 | awk '{print $1":"$2}'))
-#containers=($(${docker_bin} ps -a | tail -n +2 | awk '{print $2}'))
-#
-#containers_reg=" ${containers[*]} "
-#remove=()
-#
-#for item in ${images[@]}; do
-#  if [[ ! $containers_reg =~ " $item " ]]; then
-#    remove+=($item)
-#    if [ "${dryrun}" == false -a ! -z "${item}" ];
-#    then
-#        echo "Deleting docker unused image: ${line}";
-#        ${docker_bin} rmi ${item} || echo "Some errors happened while deleting unused image: ${item}, check the logs for details.";
-#    fi
-#  fi
-#done
-#
-#if [ ${#remove[@]} -gt 0 ];
-#then
-#    remove_images=" ${remove[*]} "
-#    if [ "${dryrun}" == true ];
-#    then
-#        echo ${remove_images} | xargs -r echo "The following unused images would be deleted: "
-#    fi
-#fi
+echo "Truncating deis-router nginx logs.";
+[ "${dryrun}" == true ] && /tmp/docker-cleanup/docker-cleanup-deisRouterLogs.sh --dry-run || /tmp/docker-cleanup/docker-cleanup-deisRouterLogs.sh
 
 echo "Done"
