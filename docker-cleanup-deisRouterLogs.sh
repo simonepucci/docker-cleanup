@@ -2,13 +2,6 @@
 #
 #
 #
-DRAIN=$(etcdctl get /deis/logs/drain);
-SERVER=$(echo ${DRAIN} | grep -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*')
-PORT=$(echo ${DRAIN} | grep -o '[0-9]*$');
-PROTO=$(echo ${DRAIN} | egrep -io 'tcp|udp|syslog');
-
-set -eou pipefail
-
 docker_bin=$(which docker.io 2> /dev/null || which docker 2> /dev/null)
 logger_bin=$(which logger 2> /dev/null)
 etcdctl_bin=$(which etcdctl 2> /dev/null)
@@ -28,7 +21,12 @@ if [ -z "$etcdctl_bin" ] ; then
     exit 1
 fi
 PROGNAME=${0##*/}
+DRAIN=$(etcdctl get /deis/logs/drain);
+SERVER=$(echo ${DRAIN} | grep -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*')
+PORT=$(echo ${DRAIN} | grep -o '[0-9]*$');
+PROTO=$(echo ${DRAIN} | egrep -io 'tcp|udp|syslog');
 PORT=${PORT:-"514"};
+
 [ "${PROTO}" == "syslog" ] && PROTO="udp";
 
 [ -z "${SERVER}" ] || LOGGEROPTS="--server ${SERVER} --port ${PORT} --${PROTO}";
@@ -52,6 +50,8 @@ do
     esac
     shift
 done
+
+set -eou pipefail
 
 # Make sure that we can talk to docker daemon. If we cannot, we fail here.
 ${docker_bin} info >/dev/null
