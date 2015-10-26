@@ -23,13 +23,14 @@ if [ -z "$etcdctl_bin" ] ; then
     exit 1
 fi
 PROGNAME=${0##*/}
-SERVER=$(etcdctl get /deis/logs/host)
-PORT=$(etcdctl get /deis/logs/port)
-PROTO=$(etcdctl get /deis/logs/protocol)
-[ -z ${SERVER} ] || LOGGEROPTS="--server ${SERVER}";
-[ -z ${PORT} ] || LOGGEROPTS="${LOGGEROPTS} --port ${PORT}";
-[ -z ${PROTO} ] || LOGGEROPTS="${LOGGEROPTS} --${PROTO}";
-[ -z ${PROGNAME} ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
+SERVER=$(etcdctl get /deis/logs/host 2>/dev/null);
+PORT=$(etcdctl get /deis/logs/port 2>/dev/null);
+PROTO=$(etcdctl get /deis/logs/protocol 2>/dev/null);
+PORT=${PORT:-"514"};
+PROTO=${PROTO:-"udp"};
+
+[ -z "${SERVER}" ] || LOGGEROPTS="--server ${SERVER} --port ${PORT} --${PROTO}";
+[ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
 [ -z "${logger_bin}" ] && logger_bin=echo || logger_bin="${logger_bin} ${LOGGEROPTS}"
 
 while [[ $# > 0 ]]
