@@ -2,6 +2,11 @@
 #
 #
 #
+DRAIN=$(etcdctl get /deis/logs/drain);
+SERVER=$(echo ${DRAIN} | grep -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*')
+PORT=$(echo ${DRAIN} | grep -o '[0-9]*$');
+PROTO=$(echo ${DRAIN} | egrep -io 'tcp|udp|syslog');
+
 set -eou pipefail
 
 docker_bin=$(which docker.io 2> /dev/null || which docker 2> /dev/null)
@@ -23,11 +28,8 @@ if [ -z "$etcdctl_bin" ] ; then
     exit 1
 fi
 PROGNAME=${0##*/}
-SERVER=$(etcdctl get /deis/logs/host 2>/dev/null);
-PORT=$(etcdctl get /deis/logs/port 2>/dev/null);
-PROTO=$(etcdctl get /deis/logs/protocol 2>/dev/null);
 PORT=${PORT:-"514"};
-PROTO=${PROTO:-"udp"};
+[ "${PROTO}" == "syslog" ] && PROTO="udp";
 
 [ -z "${SERVER}" ] || LOGGEROPTS="--server ${SERVER} --port ${PORT} --${PROTO}";
 [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
