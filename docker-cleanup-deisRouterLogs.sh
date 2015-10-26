@@ -29,7 +29,7 @@ PROTO=$(etcdctl get /deis/logs/protocol)
 [ -z ${SERVER} ] || LOGGEROPTS="--server ${SERVER}";
 [ -z ${PORT} ] || LOGGEROPTS="${LOGGEROPTS} --port ${PORT}";
 [ -z ${PROTO} ] || LOGGEROPTS="${LOGGEROPTS} --${PROTO}";
-[ -z ${PROGNAME} ] || LOGGEROPTS="${LOGGEROPTS} -t ${PROGNAME}";
+[ -z ${PROGNAME} ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
 [ -z "${logger_bin}" ] && logger_bin=echo || logger_bin="${logger_bin} ${LOGGEROPTS}"
 
 while [[ $# > 0 ]]
