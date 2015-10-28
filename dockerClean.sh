@@ -49,7 +49,7 @@ PROTO=${PROTO:-"udp"}
 [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
 [ -z "${logger_bin}" ] || LOGGERBIN="${logger_bin} ${LOGGEROPTS}";
 
-[ -z "${SERVER}" ] || PRGSOPTS="-s ${SERVER} -p ${PORT} -o ${PROTO}";
+[ -z "${SERVER}" ] && PRGSOPTS="" || PRGSOPTS="-s ${SERVER} -p ${PORT} -o ${PROTO}";
 
 #Call other maintenace scripts with proper params
 msg "Running: clanup images and containers";
