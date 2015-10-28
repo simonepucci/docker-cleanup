@@ -49,13 +49,15 @@ PROTO=${PROTO:-"udp"}
 [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
 [ -z "${logger_bin}" ] || LOGGERBIN="${logger_bin} ${LOGGEROPTS}";
 
+[ -z "${SERVER}" ] || PRGSOPTS="-s ${SERVER} -p ${PORT} -o ${PROTO}";
+
 #Call other maintenace scripts with proper params
 msg "Running: clanup images and containers";
-[ "${dryrun}" == true ] && ./docker-cleanup-images.sh -n || ./docker-cleanup-images.sh $@
+[ "${dryrun}" == true ] && ./docker-cleanup-images.sh -n || ./docker-cleanup-images.sh ${PRGSOPTS}
 
 msg "Running: cleanup volumes.";
 [ "${dryrun}" == true ] && ./docker-cleanup-volumes.sh --dry-run || ./docker-cleanup-volumes.sh
 
 msg "Truncating deis-router nginx logs.";
-[ "${dryrun}" == true ] && ./docker-cleanup-deisRouterLogs.sh -n || ./docker-cleanup-deisRouterLogs.sh $@
+[ "${dryrun}" == true ] && ./docker-cleanup-deisRouterLogs.sh -n || ./docker-cleanup-deisRouterLogs.sh ${PRGSOPTS}
 
