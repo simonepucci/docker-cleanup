@@ -17,7 +17,7 @@ After=docker.socket deis-builder.service deis-controller.service deis-store-admi
 Type=oneshot
 ExecStartPre=-/bin/sh -c 'cd /tmp/ && git clone https://github.com/simonepucci/docker-cleanup.git'
 ExecStartPre=-/bin/sh -c 'cd /tmp/docker-cleanup/ && git pull'
-ExecStart=/bin/sh -c '/tmp/docker-cleanup/ && ./dockerClean.sh'
+ExecStart=/bin/sh -c 'cd /tmp/docker-cleanup/ && ./dockerClean.sh'
 
 [X-Fleet]
 Conflicts=docker-clean@*.service
