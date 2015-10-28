@@ -30,7 +30,7 @@ function msg(){
     then
         colecho "2" "Warning: No msg to display";
     else
-        colecho "$2" "$1";
+        [ $# -eq 2 ] && colecho "$2" "$1" || colecho "" "$1"
         [ -z "${LOGGERBIN}" ] || ${LOGGERBIN} "$1";
     fi
 }
