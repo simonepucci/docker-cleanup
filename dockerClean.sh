@@ -11,6 +11,8 @@
 #DISCLAIMER        -p: port: numeric port of syslog server.
 #DISCLAIMER        -o: protocol: syslog protocl to use. Must be one of "tcp-udp-syslog".
 
+which etcdctl 2> /dev/null && SERVER=$(etcdctl get /deis/logs/drain | grep -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*');
+
 dryrun=false
 
 [ -f functions.sh ] && source ./functions.sh || exit 254
