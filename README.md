@@ -9,9 +9,9 @@ Script used in deis cluster to cleanup docker unused stuff
 cat >docker-clean\@1.service<<EOF
 [Unit]
 Description=Clean up disk space
-Requires=docker.socket
-Wants=deis-builder.service deis-controller.service deis-store-admin.service
-After=docker.socket deis-builder.service deis-controller.service deis-store-admin.service
+Requires=docker.socket fleet.socket
+Wants=deis-controller.service
+After=docker.socket fleet.socket
 
 [Service]
 Type=oneshot

@@ -11,7 +11,8 @@
 #DISCLAIMER        -p: port: numeric port of syslog server.
 #DISCLAIMER        -o: protocol: syslog protocl to use. Must be one of "tcp-udp-syslog".
 
-which etcdctl 2> /dev/null && SERVER=$(etcdctl get /deis/logs/drain | grep -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*');
+etcdctl_bin=$(which etcdctl 2> /dev/null);
+[ -z "${etcdctl_bin}" ] || SERVER=$(${etcdctl_bin} get /deis/logs/drain | grep -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*');
 
 dryrun=false
 
