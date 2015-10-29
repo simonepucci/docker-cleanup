@@ -26,6 +26,7 @@ function error(){
 
 #Require LOGGERBIN global variable to be populated...
 function msg(){
+    PNAME=${0##*/};
     TMPCACHEFOLD="/tmp";
     [ -d ${TMPCACHEFOLD} ] || mkdir -p "${TMPCACHEFOLD}";
     XTRLGDST="${TMPCACHEFOLD}/VerboseLog_${PNAME}_$$.log";

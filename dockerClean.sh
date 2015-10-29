@@ -53,12 +53,12 @@ PROTO=${PROTO:-"udp"}
 [ -z "${SERVER}" ] && PRGSOPTS="" || PRGSOPTS="-s ${SERVER} -p ${PORT} -o ${PROTO}";
 
 #Call other maintenace scripts with proper params
-msg "Running: clanup images and containers";
+msg "Running: clanup images and containers.";
 [ "${dryrun}" == true ] && ./docker-cleanup-images.sh -n || ./docker-cleanup-images.sh ${PRGSOPTS}
 
 msg "Running: cleanup volumes.";
 [ "${dryrun}" == true ] && ./docker-cleanup-volumes.sh --dry-run || ./docker-cleanup-volumes.sh
 
-msg "Truncating deis-router nginx logs.";
+msg "Running: truncate deis-router nginx logs.";
 [ "${dryrun}" == true ] && ./docker-cleanup-deisRouterLogs.sh -n || ./docker-cleanup-deisRouterLogs.sh ${PRGSOPTS}
 
