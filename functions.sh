@@ -26,12 +26,18 @@ function error(){
 
 #Require LOGGERBIN global variable to be populated...
 function msg(){
+    TMPCACHEFOLD="/tmp";
+    [ -d ${TMPCACHEFOLD} ] || mkdir -p "${TMPCACHEFOLD}";
+    XTRLGDST="${TMPCACHEFOLD}/VerboseLog_${PNAME}_$$.log";
+
     if [ -z "$1" ];
     then
         colecho "2" "Warning: No msg to display";
     else
         [ $# -eq 2 ] && colecho "$2" "$1" || colecho "" "$1"
         [ -z "${LOGGERBIN}" ] || ${LOGGERBIN} "$1";
+        [ -f ${XTRLGDST} ] && echo "$1" >> ${XTRLGDST} || { echo "This file is logged also via: ${LOGGERBIN}" > ${XTRLGDST}; echo ""; echo "$1" >> ${XTRLGDST}; }
     fi
 }
+
 
