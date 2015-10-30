@@ -6,30 +6,16 @@
 #DISCLAIMER    Usage Options: [-dopsh ]
 #DISCLAIMER        -n: dry run: display only what would get removed.
 #DISCLAIMER        -h: help: display usage and exit.
-#DISCLAIMER        -s: server: ipv4 address of syslog server to send logs to.
-#DISCLAIMER        -p: port: numeric port of syslog server.
-#DISCLAIMER        -o: protocol: syslog protocl to use. Must be one of "tcp-udp-syslog".
 
 dryrun=false
 
 [ -f functions.sh ] && source ./functions.sh || exit 254
 
 [[ "$*" =~ \-{2}+ ]] && error "Double dash sign '--' not supported";
-
-while getopts "hno:p:s:" opt "$@"
+while getopts "hn" opt "$@"
 do
         case $opt in
                 n) dryrun=true
-                ;;
-                o) PROTO=$(echo ${OPTARG} | egrep -io 'tcp|udp|syslog')
-                   [ -z "${PROTO}" ] && error "Protocol unknown: \"${OPTARG}\""
-                   [ "${PROTO}" == "syslog" ] && PROTO="udp"
-                ;;
-                p) PORT=$(echo ${OPTARG} | grep -o '[0-9]*')
-                   [ -z "${PORT}" ] && error "Port Must be a number: \"${OPTARG}\""
-                ;;
-                s) SERVER=$(echo ${OPTARG} | grep -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*')
-                   [ -z "${SERVER}" ] && error "Server must be an ipv4 address: \"${OPTARG}\""
                 ;;
                 h) usage
                 ;;
@@ -37,14 +23,6 @@ do
                 ;;
         esac
 done
-logger_bin=$(which logger 2> /dev/null)
-PROGNAME=${0##*/}
-PORT=${PORT:-"514"}
-PROTO=${PROTO:-"udp"}
-[ "${PROTO}" == "syslog" ] && PROTO="udp";
-[ -z "${SERVER}" ] || LOGGEROPTS="--server ${SERVER} --port ${PORT} --${PROTO}";
-[ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
-[ -z "${logger_bin}" ] || LOGGERBIN="${logger_bin} ${LOGGEROPTS}";
 
 docker_bin=$(which docker.io 2> /dev/null || which docker 2> /dev/null)
 # Default dir

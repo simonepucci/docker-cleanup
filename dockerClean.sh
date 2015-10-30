@@ -7,9 +7,6 @@
 #DISCLAIMER    Usage Options: [-dopsh ]
 #DISCLAIMER        -n: dry run: display only what would get removed.
 #DISCLAIMER        -h: help: display usage and exit.
-#DISCLAIMER        -s: server: ipv4 address of syslog server to send logs to.
-#DISCLAIMER        -p: port: numeric port of syslog server.
-#DISCLAIMER        -o: protocol: syslog protocl to use. Must be one of "tcp-udp-syslog".
 
 dryrun=false
 

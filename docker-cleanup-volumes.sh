@@ -1,5 +1,7 @@
 #! /bin/bash
 
+[ -f functions.sh ] && source ./functions.sh || exit 254
+
 set -eou pipefail
 
 #usage: sudo ./docker-cleanup-volumes.sh [--dry-run]
@@ -47,6 +49,7 @@ function delete_volumes() {
                         if [ "${dryrun}" == false ]; then
                                 echo Deleting ${dir}
                                 rm -rf ${targetdir}/${dir}
+                                msg "DeletedDir: ${targetdir}/${dir}"
                         else
                                 echo Would have deleted ${dir}
                         fi
