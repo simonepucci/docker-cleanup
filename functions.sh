@@ -1,7 +1,36 @@
+#Global variables used by functions
+#Placed here for convenience
 
+#Required tools
+GREP_BIN=$(which grep 2> /dev/null) || exit -1
+SED_BIN=$(which sed 2> /dev/null) || exit -1
+
+#Specific initialization for LOGGERBIN
+function logbininit(){
+    LOG_BIN=$(which logger 2> /dev/null)
+
+    #Get syslog server from deis configuration via etcdctl
+    ETCDCTL_BIN=$(which etcdctl 2> /dev/null);
+    [ -z "${ETCDCTL_BIN}" ] || DRAIN=$(${ETCDCTL_BIN} get /deis/logs/drain)
+
+    #Parse syslog url and populate variables
+    [ -z "${DRAIN}" ] || SERVER=$(echo ${DRAIN} | ${GREP_BIN} -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*');
+    [ -z "${DRAIN}" ] || PORT=$(echo ${DRAIN} | ${GREP_BIN} -o '[0-9]*$');
+    [ -z "${DRAIN}" ] || PROTO=$(echo ${DRAIN} | ${GREP_BIN} -Eio 'tcp|udp|syslog');
+
+    #LOGGERBIN variable construction
+    PORT=${PORT:-"514"}
+    PROTO=${PROTO:-"udp"}
+    [ "${PROTO}" == "syslog" ] && PROTO="udp";
+    [ -z "${SERVER}" ] || LOGGEROPTS="--server ${SERVER} --port ${PORT} --${PROTO}";
+    [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
+    [ -z "${LOG_BIN}" ] || export LOGGERBIN="${LOG_BIN} ${LOGGEROPTS}";
+}
+
+#Functions definition
 function usage(){
-    PNAME=${0##*/}
-    grep '#DISCLAIMER' ${PNAME}|sed 's/#DISCLAIMER//g'
+    PROGNAME=${0##*/}
+    ${GREP_BIN} '#DISCLAIMER' ${PROGNAME} | ${SED_BIN} 's/#DISCLAIMER//g'
     exit 0;
 }
 
@@ -25,11 +54,12 @@ function error(){
 }
 
 #Require LOGGERBIN global variable to be populated...
+logbininit
 function msg(){
-    PNAME=${0##*/};
+    PROGNAME=${0##*/}
     TMPCACHEFOLD="/tmp";
     [ -d ${TMPCACHEFOLD} ] || mkdir -p "${TMPCACHEFOLD}";
-    XTRLGDST="${TMPCACHEFOLD}/VerboseLog_${PNAME}_$$.log";
+    XTRLGDST="${TMPCACHEFOLD}/VerboseLog_${PROGNAME}_$$.log";
 
     if [ -z "$1" ];
     then
