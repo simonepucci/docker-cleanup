@@ -7,6 +7,7 @@ SED_BIN=$(which sed 2> /dev/null) || exit -1
 
 #Specific initialization for LOGGERBIN
 function logbininit(){
+    PROGNAME=${0##*/}
     LOG_BIN=$(which logger 2> /dev/null)
 
     #Get syslog server from deis configuration via etcdctl
