@@ -9,6 +9,7 @@ SED_BIN=$(which sed 2> /dev/null) || exit -1
 function logbininit(){
     PROGNAME=${0##*/}
     LOG_BIN=$(which logger 2> /dev/null)
+    DATE_BIN=$(which date 2> /dev/null)
 
     #Get syslog server from deis configuration via etcdctl
     ETCDCTL_BIN=$(which etcdctl 2> /dev/null);
@@ -24,7 +25,9 @@ function logbininit(){
     PROTO=${PROTO:-"udp"}
     [ "${PROTO}" == "syslog" ] && PROTO="udp";
     [ -z "${SERVER}" ] || LOGGEROPTS="--server ${SERVER} --port ${PORT} --${PROTO}";
-    [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}";
+    [ -z "${DATE_BIN}" ] || CDATE=$(${DATE_BIN} +%Y-%m-%dT%H:%M:%SZ)
+    [ -z "${CDATE}" ] || LOGGEROPTS="${LOGGEROPTS} ${CDATE}";
+    [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}[$$]:";
     [ -z "${LOG_BIN}" ] || export LOGGERBIN="${LOG_BIN} ${LOGGEROPTS}";
 }
 
