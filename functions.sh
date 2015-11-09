@@ -10,10 +10,13 @@ function logbininit(){
     PROGNAME=${0##*/}
     LOG_BIN=$(which logger 2> /dev/null)
     DATE_BIN=$(which date 2> /dev/null)
+    HOSTNAME_BIN=$(which hostname 2> /dev/null)
 
     #Get syslog server from deis configuration via etcdctl
     ETCDCTL_BIN=$(which etcdctl 2> /dev/null);
     [ -z "${ETCDCTL_BIN}" ] || DRAIN=$(${ETCDCTL_BIN} get /deis/logs/drain)
+    [ -z "${ETCDCTL_BIN}" ] || DEISDOM=$(${ETCDCTL_BIN} get /deis/platform/domain)
+    [ -z ${DEISDOM} ] && DEISDOM=$(${HOSTNAME_BIN})
 
     #Parse syslog url and populate variables
     [ -z "${DRAIN}" ] || SERVER=$(echo ${DRAIN} | ${GREP_BIN} -o '[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*');
@@ -27,7 +30,7 @@ function logbininit(){
     [ -z "${SERVER}" ] || LOGGEROPTS="--server ${SERVER} --port ${PORT} --${PROTO}";
     [ -z "${DATE_BIN}" ] || CDATE=$(${DATE_BIN} +%Y-%m-%dT%H:%M:%SZ)
     [ -z "${CDATE}" ] || LOGGEROPTS="${LOGGEROPTS} ${CDATE}";
-    [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}[$$]:";
+    [ -z "${PROGNAME}" ] || LOGGEROPTS="${LOGGEROPTS} ${PROGNAME}[${DEISDOM}]:";
     [ -z "${LOG_BIN}" ] || export LOGGERBIN="${LOG_BIN} ${LOGGEROPTS}";
 }
 
