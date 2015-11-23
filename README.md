@@ -28,10 +28,10 @@ EOF
 
 ### Check the X-ConditionMachineOf value in docker-clean timer config file
     You have to match a different docker-clean service for each timer you create.
-    For ex. on a 3 host cluster you will have 3 docker-clean\@X.timer
+    For ex. on a 3 host cluster you will have 3 docker-clean@X.timer
     For each of them a proper X-ConditionMachineOf=docker-clean@X.service must be set.
 
-    The docker-clean\@X.service files do not require any modifications, the content is the same for all.
+    The docker-clean@X.service files do not require any modifications, the content is the same for all.
 
 ```
 cat >docker-clean\@1.timer<<EOF
@@ -48,13 +48,13 @@ EOF
 
 ## loads the service and timer units
 
-    fleetctl load docker-clean\@\*.service
+    fleetctl load docker-clean@*.service
 
-    fleetctl load docker-clean\@\*.timer
+    fleetctl load docker-clean@*.timer
 
 ## starts the timer
 
-    fleetctl start docker-clean\@\*.timer
+    fleetctl start docker-clean@*.timer
 
 ## check service and timer
 
