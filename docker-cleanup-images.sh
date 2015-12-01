@@ -66,10 +66,10 @@ ContainerImageIdList="${TMPCACHEFOLD}/ContainerImageIdList"
 ImageIdList="${TMPCACHEFOLD}/ImageIdList"
 ImageFullList="${TMPCACHEFOLD}/ImageFullList"
 InUseByLoweridList="${TMPCACHEFOLD}/InUseByLoweridList"
-RunningFleetImages="${TMPCACHEFOLD}/RunningFleetImages"
+RunningFleetImagesList="${TMPCACHEFOLD}/RunningFleetImagesList"
 ToBePreservedImagesNames="alpine|deis|datadog|docker-clean|UNIT"
 
-rm -f ${EffectiveToBeCleanedImageIdList} ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList} ${InUseByLoweridList} ${RunningFleetImages}
+rm -f ${EffectiveToBeCleanedImageIdList} ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList} ${InUseByLoweridList} ${RunningFleetImagesList}
 
 # Get all image ID
 ${docker_bin} images -q --no-trunc | sort -o ${ImageIdList}
@@ -90,8 +90,8 @@ sort ${ContainerImageIdList} -o ${ContainerImageIdList}
 comm -23 ${ImageIdList} ${ContainerImageIdList} > ${ToBeCleanedImageIdList}
 
 # Add images actually running to InUseByLoweridList and last 5 deployed images for each appname found via fleetctl
-fleetctl list-units | grep -Ev "${ToBePreservedImagesNames}" | awk '{print $1}' > ${RunningFleetImages}
-cat ${RunningFleetImages} | while read line;
+fleetctl list-units | grep -Ev "${ToBePreservedImagesNames}" | awk '{print $1}' > ${RunningFleetImagesList}
+cat ${RunningFleetImagesList} | while read line;
 do
     APPVER=${line%%.*};
     grep "${APPVER%%_*}:${APPVER##*_}" ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList}
