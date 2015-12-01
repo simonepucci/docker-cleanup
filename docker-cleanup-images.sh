@@ -92,7 +92,7 @@ comm -23 ${ImageIdList} ${ContainerImageIdList} > ${ToBeCleanedImageIdList}
 fleetctl list-units | grep -Ev "${ToBePreservedImagesNames}" | awk '{print $1}' | while read line;
 do
     APPVER=${line%%.*};
-    ToBePreservedImagesNames="${ToBePreservedImagesNames}|${APPVER%%_*}:${APPVER##*_}";
+    grep "${APPVER%%_*}:${APPVER##*_}" ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList}
 done
 
 # Add images to be preserved to InUseByLoweridList
