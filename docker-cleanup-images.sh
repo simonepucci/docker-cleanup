@@ -109,8 +109,11 @@ do
     then
         grep ${line} ${ImageFullList} | awk '{print $2}' | xargs -r echo "The following unused images would be deleted:";
     else
+	unset CURIMAGES;
+	CURIMAGES=$(grep ${line} ${ImageFullList} | awk '{print $2}' | xargs -r echo)
+	[ -z "${CURIMAGES}" ] && continue; 
         msg "Deleting docker unused image: ${line}";
-        ${docker_bin} rmi ${line} && msg "Deleted docker unused image: ${line}" || echo "Some errors happened while deleting unused image: ${line}.";
+        ${docker_bin} rmi ${CURIMAGES} && msg "Deleted docker unused image: ${line} - ${CURIMAGES}" || echo "Some errors happened while deleting unused image: ${line} - ${CURIMAGES}.";
     fi
 done
 
