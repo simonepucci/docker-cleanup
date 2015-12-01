@@ -66,7 +66,7 @@ ContainerImageIdList="${TMPCACHEFOLD}/ContainerImageIdList"
 ImageIdList="${TMPCACHEFOLD}/ImageIdList"
 ImageFullList="${TMPCACHEFOLD}/ImageFullList"
 InUseByLoweridList="${TMPCACHEFOLD}/InUseByLoweridList"
-ToBePreservedImagesNames="alpine deis"
+ToBePreservedImagesNames="alpine deis- datadog"
 
 rm -f ${EffectiveToBeCleanedImageIdList} ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList} ${InUseByLoweridList}
 
@@ -90,7 +90,7 @@ comm -23 ${ImageIdList} ${ContainerImageIdList} > ${ToBeCleanedImageIdList}
 
 #Add images to be preserved to InUseByLoweridList
 for IMAGE_LABEL in ${ToBePreservedImagesNames}; do
-    grep ${IMAGE_LABEL} ${ImageFullList} | awk '{print $1}' | xargs -r echo >> ${InUseByLoweridList};
+    grep ${IMAGE_LABEL} ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList};
 done
 
 #Find currently in use images and their parents
