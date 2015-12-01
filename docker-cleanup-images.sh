@@ -32,7 +32,7 @@ if [ -z "$docker_bin" ] ; then
     exit 1
 fi
 
-set -eou pipefail
+#set -eou pipefail
 
 msg "Removing exited docker containers..."
 if [ "${dryrun}" == true ];
