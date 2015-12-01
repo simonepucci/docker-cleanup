@@ -66,7 +66,7 @@ ContainerImageIdList="${TMPCACHEFOLD}/ContainerImageIdList"
 ImageIdList="${TMPCACHEFOLD}/ImageIdList"
 ImageFullList="${TMPCACHEFOLD}/ImageFullList"
 InUseByLoweridList="${TMPCACHEFOLD}/InUseByLoweridList"
-ToBePreservedImagesNames="alpine deis- datadog"
+ToBePreservedImagesNames="alpine|deis|datadog|docker-clean|UNIT"
 
 rm -f ${EffectiveToBeCleanedImageIdList} ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList} ${InUseByLoweridList}
 
@@ -88,12 +88,17 @@ sort ${ContainerImageIdList} -o ${ContainerImageIdList}
 # Remove the images being used by cotnainers from the delete list
 comm -23 ${ImageIdList} ${ContainerImageIdList} > ${ToBeCleanedImageIdList}
 
-#Add images to be preserved to InUseByLoweridList
-for IMAGE_LABEL in ${ToBePreservedImagesNames}; do
-    grep "${IMAGE_LABEL}" ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList}
+# Add images actually running to InUseByLoweridList
+fleetctl list-units | grep -Ev "${ToBePreservedImagesNames}" | awk '{print $1}' | while read line;
+do
+    APPVER=${line%%.*};
+    ToBePreservedImagesNames="${ToBePreservedImagesNames}|${APPVER%%_*}:${APPVER##*_}";
 done
 
-#Find currently in use images and their parents
+# Add images to be preserved to InUseByLoweridList
+grep -E "${ToBePreservedImagesNames}" ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList}
+
+# Find currently in use images and their parents
 ls -l /var/lib/docker/overlay/*/lower-id | grep -o "[0-9a-fA-F]\{64\}" | sort | uniq | while read line;
 do
     echo "${line}" >> ${InUseByLoweridList};
