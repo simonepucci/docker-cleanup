@@ -60,11 +60,14 @@ fi
 
 msg "Removing unused docker images..."
 [ -d /dev/shm ] && TMPCACHEFOLD="/dev/shm" || TMPCACHEFOLD="/tmp"
+EffectiveToBeCleanedImageIdList="${TMPCACHEFOLD}/EffectiveToBeCleanedImageIdList"
 ToBeCleanedImageIdList="${TMPCACHEFOLD}/ToBeCleanedImageIdList"
 ContainerImageIdList="${TMPCACHEFOLD}/ContainerImageIdList"
 ImageIdList="${TMPCACHEFOLD}/ImageIdList"
 ImageFullList="${TMPCACHEFOLD}/ImageFullList"
-rm -f ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList}
+InUseByLoweridList="${TMPCACHEFOLD}/InUseByLoweridList"
+
+rm -f ${EffectiveToBeCleanedImageIdList} ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList} ${InUseByLoweridList}
 
 # Get all image ID
 ${docker_bin} images -q --no-trunc | sort -o ${ImageIdList}
@@ -84,7 +87,17 @@ sort ${ContainerImageIdList} -o ${ContainerImageIdList}
 # Remove the images being used by cotnainers from the delete list
 comm -23 ${ImageIdList} ${ContainerImageIdList} > ${ToBeCleanedImageIdList}
 
-cat ${ToBeCleanedImageIdList} | while read line;
+#Find currently in use images and their parents
+ls -l /var/lib/docker/overlay/*/lower-id | grep -o "[0-9a-fA-F]\{64\}" | sort | uniq | while read line;
+do
+    echo "${line}" >> ${InUseByLoweridList};
+    cat /var/lib/docker/overlay/${line}/lower-id | xargs >> ${InUseByLoweridList};
+done
+sort ${InUseByLoweridList} -o ${InUseByLoweridList}
+# Remove the images being used by cotnainers from the delete list
+comm -23 ${ToBeCleanedImageIdList} ${InUseByLoweridList} > ${EffectiveToBeCleanedImageIdList}
+
+cat ${EffectiveToBeCleanedImageIdList} | while read line;
 do
     if [ "${dryrun}" == true ];
     then
