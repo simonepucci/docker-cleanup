@@ -101,7 +101,7 @@ do
 done
 sort ${InUseByLoweridList} -o ${InUseByLoweridList}
 # Remove the images being used by cotnainers from the delete list
-comm -23 ${ToBeCleanedImageIdList} ${InUseByLoweridList} > ${EffectiveToBeCleanedImageIdList}
+comm -23 ${ToBeCleanedImageIdList} ${InUseByLoweridList} | sort | uniq > ${EffectiveToBeCleanedImageIdList}
 
 cat ${EffectiveToBeCleanedImageIdList} | while read line;
 do
