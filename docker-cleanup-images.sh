@@ -96,6 +96,7 @@ do
     APPVER=${line%%.*};
     grep "${APPVER%%_*}:${APPVER##*_}" ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList}
     ${docker_bin} images --no-trunc ${APPVER%%_*} | grep -v "^REPOSITORY" | head -n 5 | awk '{print $3}' >> ${InUseByLoweridList}
+    ${docker_bin} images --no-trunc | grep "${APPVER%%_*}" | grep -v "^REPOSITORY" | grep -v git | head -n 5 | awk '{print $3}' >> ${InUseByLoweridList}
 done
 
 # Add images to be preserved to InUseByLoweridList
