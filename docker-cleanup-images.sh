@@ -90,7 +90,7 @@ comm -23 ${ImageIdList} ${ContainerImageIdList} > ${ToBeCleanedImageIdList}
 
 #Add images to be preserved to InUseByLoweridList
 for IMAGE_LABEL in ${ToBePreservedImagesNames}; do
-    grep '${IMAGE_LABEL}' ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList}
+    grep "${IMAGE_LABEL}" ${ImageFullList} | awk '{print $1}' >> ${InUseByLoweridList}
 done
 
 #Find currently in use images and their parents
