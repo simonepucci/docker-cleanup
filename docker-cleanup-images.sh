@@ -66,6 +66,7 @@ ContainerImageIdList="${TMPCACHEFOLD}/ContainerImageIdList"
 ImageIdList="${TMPCACHEFOLD}/ImageIdList"
 ImageFullList="${TMPCACHEFOLD}/ImageFullList"
 InUseByLoweridList="${TMPCACHEFOLD}/InUseByLoweridList"
+ToBePreservedImagesNames="alpine deis"
 
 rm -f ${EffectiveToBeCleanedImageIdList} ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList} ${InUseByLoweridList}
 
@@ -86,6 +87,11 @@ sort ${ContainerImageIdList} -o ${ContainerImageIdList}
 
 # Remove the images being used by cotnainers from the delete list
 comm -23 ${ImageIdList} ${ContainerImageIdList} > ${ToBeCleanedImageIdList}
+
+#Add images to be preserved to InUseByLoweridList
+for IMAGE_LABEL in ${ToBePreservedImagesNames}; do
+    grep ${IMAGE_LABEL} ${ImageFullList} | awk '{print $1}' | xargs -r echo >> ${InUseByLoweridList};
+done
 
 #Find currently in use images and their parents
 ls -l /var/lib/docker/overlay/*/lower-id | grep -o "[0-9a-fA-F]\{64\}" | sort | uniq | while read line;
