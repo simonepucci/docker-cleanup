@@ -29,8 +29,8 @@ done
 msg "Running: clanup images and containers.";
 [ "${dryrun}" == true ] && ./docker-cleanup-images.sh -n || ./docker-cleanup-images.sh
 
-msg "Running: cleanup volumes.";
-[ "${dryrun}" == true ] && ./docker-cleanup-volumes.sh --dry-run || ./docker-cleanup-volumes.sh
+#msg "Running: cleanup volumes.";
+#[ "${dryrun}" == true ] && ./docker-cleanup-volumes.sh --dry-run || ./docker-cleanup-volumes.sh
 
 msg "Running: truncate deis-router nginx logs.";
 [ "${dryrun}" == true ] && ./docker-cleanup-deisRouterLogs.sh -n || ./docker-cleanup-deisRouterLogs.sh
