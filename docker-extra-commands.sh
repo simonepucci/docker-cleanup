@@ -34,9 +34,14 @@ fleetctl_bin=$(which fleetctl 2> /dev/null)
 
 cat /tmp/RUN | while read line;
 do
-    ${fleetctl_bin} list-units | grep "${line}" | grep "dead";
-    [ $? -eq 0 ] && { ${fleetctl_bin} start "${line}"; msg "Executed: fleetctl start ${line}"; } || msg "Skipping: ${line}, because is already running.";
+    if [ "${dryrun}" == true ];
+    then
+        msg "The following extra commands would be executed: fleetctl start ${line}"
+    else
+        ${fleetctl_bin} list-units | grep "${line}" | grep "dead";
+        [ $? -eq 0 ] && { ${fleetctl_bin} start "${line}"; msg "Executed: fleetctl start ${line}"; } || msg "Skipping: ${line}, because is already running.";
+    fi
 done
 
-/bin/mv /tmp/RUN /tmp/RUN.executed;
+[ "${dryrun}" == true ] || /bin/mv /tmp/RUN /tmp/RUN.executed;
 
