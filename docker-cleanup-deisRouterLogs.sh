@@ -3,7 +3,7 @@
 #
 #
 #DISCLAIMER    Truncate nginx logfile: truncate deis-router container log.
-#DISCLAIMER    Usage Options: [-dopsh ]
+#DISCLAIMER    Usage Options: [-nh ]
 #DISCLAIMER        -n: dry run: display only what would get removed.
 #DISCLAIMER        -h: help: display usage and exit.
 

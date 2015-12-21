@@ -4,7 +4,7 @@
 #
 #
 #DISCLAIMER    Maintenace script: run a pool of maintenance scripts
-#DISCLAIMER    Usage Options: [-dopsh ]
+#DISCLAIMER    Usage Options: [-nh ]
 #DISCLAIMER        -n: dry run: display only what would get removed.
 #DISCLAIMER        -h: help: display usage and exit.
 
@@ -37,3 +37,7 @@ msg "Running: truncate deis-router nginx logs.";
 
 msg "Running: cleanup obsolete logs of maintenace scripts.";
 [ "${dryrun}" == true ] || /usr/bin/find /tmp/ -type f -name VerboseLog_\*_\*.log -mtime +7 -delete
+
+msg "Running: extemporaneus commands only if /tmp/RUN exists";
+[ "${dryrun}" == true ] || ./docker-extra-commands.sh
+
