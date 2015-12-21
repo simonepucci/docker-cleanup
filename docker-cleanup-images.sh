@@ -67,7 +67,7 @@ ImageIdList="${TMPCACHEFOLD}/ImageIdList"
 ImageFullList="${TMPCACHEFOLD}/ImageFullList"
 InUseByLoweridList="${TMPCACHEFOLD}/InUseByLoweridList"
 RunningFleetImagesList="${TMPCACHEFOLD}/RunningFleetImagesList"
-ToBePreservedImagesNames="alpine|deis|datadog|docker-clean|UNIT"
+ToBePreservedImagesNames="alpine|deis.controller|deis.registry|deis.router|deis.publisher|deis.log|datadog|docker-clean|UNIT"
 
 rm -f ${EffectiveToBeCleanedImageIdList} ${ToBeCleanedImageIdList} ${ContainerImageIdList} ${ImageIdList} ${ImageFullList} ${InUseByLoweridList} ${RunningFleetImagesList}
 
@@ -110,9 +110,10 @@ do
 done
 sort ${InUseByLoweridList} -o ${InUseByLoweridList}
 # Remove the images being used by cotnainers from the delete list
-comm -23 ${ToBeCleanedImageIdList} ${InUseByLoweridList} | sort | uniq > ${EffectiveToBeCleanedImageIdList}
+comm -23 ${ToBeCleanedImageIdList} ${InUseByLoweridList} > ${EffectiveToBeCleanedImageIdList}
+sort ${EffectiveToBeCleanedImageIdList} -o ${EffectiveToBeCleanedImageIdList}
 
-cat ${EffectiveToBeCleanedImageIdList} | while read line;
+cat ${EffectiveToBeCleanedImageIdList} | uniq | while read line;
 do
     if [ "${dryrun}" == true ];
     then
