@@ -2,6 +2,9 @@
 Script used in deis cluster to cleanup docker unused stuff
 
     Run the script on docker physical machines
+    The main script will call a subset of specialized sub-scripts 
+    This approach is hopefully more clear and easy to mantain and customize.
+    
 
 ## First create fleetctl service configuration files, one per server.
 
@@ -59,4 +62,22 @@ EOF
 ## check service and timer
 
     fleetctl list-units | grep "docker-clean"
+
+## Included scripts
+
+###   functions.sh
+    A subset of basic utils used by other scripts
+###   dockerClean.sh
+    The main program called by fleetctl, in other words an orchestration script
+###   docker-cleanup-images.sh
+    A cleaning unused docker images and volumes if overlay driver is used by docker
+###   docker-cleanup-volumes.sh
+    The original script used to clenup disk space if docker use VFS driver
+###   docker-cleanup-deisRouterLogs.sh
+    Simply truncate nginx routers logfile
+###   docker-extra-commands.sh
+    A tool used to startup fleet units at the end of cleanup procedure, useful when cleaning deis-builder stuff
+    In order to start some units, a file named /tmp/RUN must exist on a node.
+    The /tmp/RUN can contain fleet services names one per line. 
+    At the moment that docker-extra-commands.sh will be executed, each service contained in the file /tmp/RUN will be triggered, if not already running.
 

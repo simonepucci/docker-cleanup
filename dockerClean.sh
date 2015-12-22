@@ -38,6 +38,6 @@ msg "Running: truncate deis-router nginx logs.";
 msg "Running: cleanup obsolete logs of maintenace scripts.";
 [ "${dryrun}" == true ] || /usr/bin/find /tmp/ -type f -name VerboseLog_\*_\*.log -mtime +7 -delete
 
-msg "Running: extemporaneus commands only if /tmp/RUN exists";
+msg "Running: extemporaneous commands only if /tmp/RUN exists";
 [ "${dryrun}" == true ] || ./docker-extra-commands.sh
 
