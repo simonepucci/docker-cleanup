@@ -2,7 +2,15 @@
 #
 #
 #	Restart docker if memory leak happened...
+cat > /etc/systemd/system/docker.service.d/10-increase-ulimit.conf <<EOF
+[Service]
+LimitMEMLOCK=infinity
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitMAXLOCKED=unlimited
+EOF
 
+systemctl daemon-reload
 systemctl restart docker.service
 
 sleep 9;
