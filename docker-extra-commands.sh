@@ -2,8 +2,11 @@
 #
 #
 #
-#DISCLAIMER    Run extra commands if /tmp/RUN is present.
-#DISCLAIMER    Read line per line /tmp/RUN content and run fleetctl start, if is not already running.
+#DISCLAIMER    Run extra commands if the file given as argument is present.
+#DISCLAIMER    Read line per line the file content and run fleetctl against the content of each line.
+#DISCLAIMER    For example a file could contain:
+#DISCLAIMER        start datadog.service
+#DISCLAIMER        stop datadog.service
 #DISCLAIMER    Usage Options: [-nh ]
 #DISCLAIMER        -n: dry run: display only what would get removed.
 #DISCLAIMER        -h: help: display usage and exit.
@@ -25,23 +28,34 @@ do
                 ;;
         esac
 done
+[ $# -gt 2 ] && usage || INFILE="$(eval "echo -n \$$#")";
+
+FLEETCMD="";
 
 fleetctl_bin=$(which fleetctl 2> /dev/null)
 [ -z "${fleetctl_bin}" ] && { msg "fleetctl command not found, can not run this script."; exit 1; }
 #set -eou pipefail
 
-[ -f /tmp/RUN ] || { msg "Exiting without running any extra command."; exit 0; }
+[ -f "${INFILE}" ] || { msg "Exiting without running any extra command."; exit 0; }
 
-cat /tmp/RUN | while read line;
+cat ${INFILE} | while read line;
 do
     if [ "${dryrun}" == true ];
     then
-        msg "The following extra commands would be executed: fleetctl start ${line}"
+        msg "The following extra commands would be executed: fleetctl ${line}"
     else
-        ${fleetctl_bin} list-units | grep "${line}" | grep "dead";
-        [ $? -eq 0 ] && { ${fleetctl_bin} start "${line}"; msg "Executed: fleetctl start ${line}"; } || msg "Skipping: ${line}, because is already running.";
+        cat "${line}" | cut -d ' '  -f 1 | grep -q "stop";
+        [ $? -eq 0 ] && FLEETCMD="stop";
+
+        cat "${line}" | cut -d ' '  -f 1 | grep -q "start";
+        [ $? -eq 0 ] && FLEETCMD="start";
+
+        [ -z "${FLEETCMD}" ] && { msg "fleet command not parsable, it must be: start or stop."; exit 1; }
+
+        ${fleetctl_bin} ${line}
+        msg "Executed: ${fleetctl_bin} ${line}";
     fi
 done
 
-[ "${dryrun}" == true ] || /bin/mv /tmp/RUN /tmp/RUN.executed;
+[ "${dryrun}" == true ] || /bin/mv ${INFILE} ${INFILE}.executed;
 

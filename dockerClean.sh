@@ -25,6 +25,9 @@ do
         esac
 done
 
+msg "Running: extemporaneous commands only if /tmp/RUNPRE exists";
+[ "${dryrun}" == true ] || ./docker-extra-commands.sh /tmp/RUNPRE
+
 #Call other maintenace scripts with proper params
 msg "Running: clanup images and containers.";
 [ "${dryrun}" == true ] && ./docker-cleanup-images.sh -n || ./docker-cleanup-images.sh
@@ -39,5 +42,5 @@ msg "Running: cleanup obsolete logs of maintenace scripts.";
 [ "${dryrun}" == true ] || /usr/bin/find /tmp/ -type f -name VerboseLog_\*_\*.log -mtime +7 -delete
 
 msg "Running: extemporaneous commands only if /tmp/RUN exists";
-[ "${dryrun}" == true ] || ./docker-extra-commands.sh
+[ "${dryrun}" == true ] || ./docker-extra-commands.sh /tmp/RUN
 
