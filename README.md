@@ -19,6 +19,7 @@ After=docker.socket fleet.socket
 [Service]
 Type=oneshot
 ExecStartPre=-/bin/sh -c 'cd /tmp/ && git clone https://github.com/simonepucci/docker-cleanup.git'
+ExecStartPre=-/bin/sh -c 'cd /tmp/docker-cleanup/ && git ls-files -d -z | xargs -0 git checkout --'
 ExecStartPre=-/bin/sh -c 'cd /tmp/docker-cleanup/ && git pull'
 ExecStart=/bin/sh -c 'cd /tmp/docker-cleanup/ && ./dockerClean.sh'
 
