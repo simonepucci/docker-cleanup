@@ -25,10 +25,11 @@ do
         esac
 done
 
+#Call other maintenace scripts with proper params
+#################################################
 msg "Running: extemporaneous commands only if /tmp/RUNPRE exists";
 [ "${dryrun}" == true ] || ./docker-extra-commands.sh /tmp/RUNPRE
 
-#Call other maintenace scripts with proper params
 msg "Running: clanup images and containers.";
 [ "${dryrun}" == true ] && ./docker-cleanup-images.sh -n || ./docker-cleanup-images.sh
 

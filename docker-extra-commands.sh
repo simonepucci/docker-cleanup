@@ -44,16 +44,12 @@ do
     then
         msg "The following extra commands would be executed: fleetctl ${line}"
     else
-        cat "${line}" | cut -d ' '  -f 1 | grep -q "stop";
-        [ $? -eq 0 ] && FLEETCMD="stop";
-
-        cat "${line}" | cut -d ' '  -f 1 | grep -q "start";
-        [ $? -eq 0 ] && FLEETCMD="start";
-
+        echo "${line}" | cut -d ' '  -f 1 | grep -Eiq 'start|stop';
+        [ $? -eq 0 ] && FLEETCMD="Ok";
         [ -z "${FLEETCMD}" ] && { msg "fleet command not parsable, it must be: start or stop."; exit 1; }
 
-        ${fleetctl_bin} ${line}
-        msg "Executed: ${fleetctl_bin} ${line}";
+        ${fleetctl_bin} ${line};
+        [ $? -eq 0 ] && msg "Executed with success: ${fleetctl_bin} ${line}" || msg "Executed with error: ${fleetctl_bin} ${line}";
     fi
 done
 
