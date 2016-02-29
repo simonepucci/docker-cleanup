@@ -26,7 +26,8 @@ do
 done
 
 BUG="";
-BUG=$( journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Could not generate persistent MAC address for .*: No such file or directory|Daemon has completed initialization" )
+BUG=$( journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Daemon has completed initialization" )
+#BUG=$( journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Could not generate persistent MAC address for .*: No such file or directory|Daemon has completed initialization" )
 [ -z "${BUG}" ] && exit 0;
 echo "${BUG}" | grep -q "Daemon has completed initialization" && msg "Docker Was restarted on Host: ${COREOS_PRIVATE_IPV4}" || msg "Docker Bug is Affecting Host: ${COREOS_PRIVATE_IPV4} - ${BUG}";
 
