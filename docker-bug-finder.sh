@@ -29,7 +29,7 @@ done
 TUNHOST=$(echo ${IPADDRESS} | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}');
 [ -z "${TUNHOST}" ] && { echo -e "Missing required argument.\nUsage: $0 IPADDRESS"; exit 1; }
 
-ssh -i .ssh/deis core@${TUNHOST} "fleetctl list-units|grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}'" | sort | uniq | xargs > /dev/shm/ip
+ssh -i ~/.ssh/deis core@${TUNHOST} "fleetctl list-units|grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}'" | sort | uniq | xargs > /dev/shm/ip
 for IPADDRESS in $(cat /dev/shm/ip);
 do
     BUG="";
