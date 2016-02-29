@@ -7,7 +7,6 @@ cat > /etc/systemd/system/docker.service.d/10-increase-ulimit.conf <<EOF
 LimitMEMLOCK=infinity
 LimitNOFILE=1048576
 LimitNPROC=1048576
-LimitMAXLOCKED=unlimited
 EOF
 
 systemctl daemon-reload
