@@ -30,12 +30,13 @@ done
 TMPDIR="/tmp/etcd2newmemberjoin";
 # Consistency checks
 systemctl_bin=$(which systemctl 2> /dev/null)
-[ -z "${systemctl_bin}" ] && { msg "systemctl command not found, can not run this script."; exit 1; }
+[ -z "${systemctl_bin}" ] && { msg "systemctl command not found, can not run this script."; exit 255; }
 etcdctl_bin=$(which etcdctl 2> /dev/null)
-[ -z "${etcdctl_bin}" ] && { msg "etcdctl command not found, can not run this script."; exit 1; }
+[ -z "${etcdctl_bin}" ] && { msg "etcdctl command not found, can not run this script."; exit 255; }
 etcd2_bin=$(which etcd2 2> /dev/null)
-[ -z "${etcd2_bin}" ] && { msg "etcd2 command not found, can not run this script."; exit 1; }
-[ -z "${TMPDIR}" ] && { msg "critical error an internal var was unset, doublecheck the content of current script"; exit 255; } || rm -rf ${TMPDIR};
+[ -z "${etcd2_bin}" ] && { msg "etcd2 command not found, can not run this script."; exit 255; }
+[ -z "${TMPDIR}" ] && { msg "critical error an internal var was unset, doublecheck the content of current script"; exit 255; }
+rm -rf ${TMPDIR};
 mkdir -p ${TMPDIR};
 ${etcdctl_bin} member list > ${TMPDIR}/list
 [ $? -ne 0 ] && { msg "Some error occurred while listing cluster members, verify that current host is already a proxy member of a healthy cluster"; exit 1; }
