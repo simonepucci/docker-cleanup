@@ -25,6 +25,8 @@ do
         esac
 done
 
+[ -f /etc/environment ] && source /etc/environment;
+
 BUG="";
 BUG=$( journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Daemon has completed initialization" )
 #BUG=$( journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Could not generate persistent MAC address for .*: No such file or directory|Daemon has completed initialization" )
