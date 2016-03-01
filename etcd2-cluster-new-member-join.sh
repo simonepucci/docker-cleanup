@@ -27,7 +27,8 @@ do
         esac
 done
 
-TMPDIR="/tmp/etcd2newmemberjoin";
+[ -d /dev/shm ] && TMPCACHEFOLD="/dev/shm" || TMPCACHEFOLD="/tmp"
+TMPDIR="${TMPCACHEFOLD}/etcd2nmj";
 # Consistency checks
 systemctl_bin=$(which systemctl 2> /dev/null)
 [ -z "${systemctl_bin}" ] && { msg "systemctl command not found, can not run this script."; exit 255; }
@@ -36,11 +37,13 @@ etcdctl_bin=$(which etcdctl 2> /dev/null)
 etcd2_bin=$(which etcd2 2> /dev/null)
 [ -z "${etcd2_bin}" ] && { msg "etcd2 command not found, can not run this script."; exit 255; }
 [ -z "${TMPDIR}" ] && { msg "critical error an internal var was unset, doublecheck the content of current script"; exit 255; }
-rm -rf ${TMPDIR};
-mkdir -p ${TMPDIR};
+rm -rf ${TMPDIR} || { msg "critical error, can not delete folder: ${TMPDIR}, check permissions."; exit 255; }
+mkdir -p ${TMPDIR} || { msg "critical error, can not create folder: ${TMPDIR}, check permissions."; exit 255; }
+
 ${etcdctl_bin} member list > ${TMPDIR}/list
 [ $? -ne 0 ] && { msg "Some error occurred while listing cluster members, verify that current host is already a proxy member of a healthy cluster"; exit 1; }
 grep -q ${COREOS_PRIVATE_IPV4} ${TMPDIR}/list && { msg "Current host is already a member of the cluster."; exit 1; }
+
 ${etcdctl_bin} cluster-health > ${TMPDIR}/health
 [ $? -ne 0 ] && { msg "Some error occurred while checking cluster health, verify that cluster is healthy"; exit 1; }
 cat ${TMPDIR}/list | cut -d ':' -f 1 | while read CLUHSTID;
@@ -48,6 +51,7 @@ do
     grep -q "member ${CLUHSTID} is healthy" ${TMPDIR}/health || { msg "Critical error: the following cluster member is unhealthy: ${CLUHSTID}"; exit 1; }
 done
 
+# Cluster node join as active member
 msg "Consistency checks passed. Now try to effectively join etcd2 cluster.";
 source /etc/environment
 ETCD2DIR="/media/etcd";
