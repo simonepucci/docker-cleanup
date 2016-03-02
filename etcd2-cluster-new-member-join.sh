@@ -61,13 +61,13 @@ PRIVATE_IPV4=$(${grep_bin} "COREOS_PRIVATE_IPV4" /etc/environment | ${grep_bin} 
 # Verify current cluster has members
 ${etcdctl_bin} member list > ${TMPDIR}/list 2>/dev/null
 [ $? -ne 0 ] && { msg "Some error occurred while listing cluster members, verify that current host is already a proxy member of a healthy cluster"; exit 1; }
-[ -s ${TMPDIR}/list ] && { msg "The file: ${TMPDIR}/list is empty, try to check the output of the following command: ${etcdctl_bin} member list"; exit 1; }
+[ -s ${TMPDIR}/list ] || { msg "The file: ${TMPDIR}/list is empty, try to check the output of the following command: ${etcdctl_bin} member list"; exit 1; }
 ${grep_bin} -q ${PRIVATE_IPV4} ${TMPDIR}/list && { msg "Current host is already a member of the cluster. Remove it and retry running this script."; exit 1; }
 
 # Verify current cluster members healthy
 ${etcdctl_bin} cluster-health > ${TMPDIR}/health 2>/dev/null
 [ $? -ne 0 ] && { msg "Some error occurred while checking cluster health, verify that cluster is healthy"; exit 1; }
-[ -s ${TMPDIR}/health ] && { msg "The file: ${TMPDIR}/health is empty, try to check the output of the following command: ${etcdctl_bin} cluster-health"; exit 1; }
+[ -s ${TMPDIR}/health ] || { msg "The file: ${TMPDIR}/health is empty, try to check the output of the following command: ${etcdctl_bin} cluster-health"; exit 1; }
 
 ${cut_bin} -d ':' -f 1 ${TMPDIR}/list | while read CLUHSTID;
 do
