@@ -34,6 +34,7 @@ TMPDIR="${TMPCACHEFOLD}/etcd2nmj";
 
 # Consistency checks
 msg "Running Consistency checks."
+# Verify if required binaries are present
 systemctl_bin=$(which systemctl 2> /dev/null)
 [ -z "${systemctl_bin}" ] && { msg "systemctl command not found, can not run this script."; exit 255; }
 etcdctl_bin=$(which etcdctl 2> /dev/null)
@@ -46,24 +47,24 @@ cut_bin=$(which cut 2> /dev/null)
 [ -z "${cut_bin}" ] && { msg "cut command not found, can not run this script."; exit 255; }
 ps_bin=$(which ps 2> /dev/null) 
 [ -z "${ps_bin}" ] && { msg "ps command not found, can not run this script."; exit 255; }
-
-[ -z "${TMPDIR}" ] && { msg "critical error an internal var was unset, doublecheck the content of current script"; exit 255; }
-rm -rf ${TMPDIR} || { msg "critical error, can not delete folder: ${TMPDIR}, check permissions."; exit 255; }
-mkdir -p ${TMPDIR} || { msg "critical error, can not create folder: ${TMPDIR}, check permissions."; exit 255; }
-
+# Verify temp path is accessible
+[ -z "${TMPDIR}" ] && { msg "Error: TMPDIR var was unset, doublecheck the content of current script"; exit 255; }
+rm -rf ${TMPDIR} || { msg "Error, can not delete folder: ${TMPDIR}, check permissions."; exit 255; }
+mkdir -p ${TMPDIR} || { msg "Error, can not create folder: ${TMPDIR}, check permissions."; exit 255; }
+# Verify existence of etcd2 media proxy folder
 [ -d ${ETCD2DIR}/proxy ] || { msg "Etcd2 Media/proxy dir is missing... The current node must be a proxy."; exit 1; }
-
+# Verify required environment variables are present
 MACHINEID=$(cat /etc/machine-id)
 [ -z "${MACHINEID}" ] && { msg "MachineId is empty, check the code... and the content of /etc/machine-id"; exit 1; }
-
 PRIVATE_IPV4=$(${grep_bin} "COREOS_PRIVATE_IPV4" /etc/environment | ${grep_bin} -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}')
 [ -z "${PRIVATE_IPV4}" ] && { msg "Some error occurred while reading PRIVATE_IPV4 from /etc/environment, check the code..."; exit 1; }
-
+# Verify current cluster has members
 ${etcdctl_bin} member list > ${TMPDIR}/list 2>/dev/null
 [ $? -ne 0 ] && { msg "Some error occurred while listing cluster members, verify that current host is already a proxy member of a healthy cluster"; exit 1; }
 [ -s ${TMPDIR}/list ] && { msg "The file: ${TMPDIR}/list is empty, try to check the output of the following command: ${etcdctl_bin} member list"; exit 1; }
 ${grep_bin} -q ${PRIVATE_IPV4} ${TMPDIR}/list && { msg "Current host is already a member of the cluster. Remove it and retry running this script."; exit 1; }
 
+# Verify current cluster members healthy
 ${etcdctl_bin} cluster-health > ${TMPDIR}/health 2>/dev/null
 [ $? -ne 0 ] && { msg "Some error occurred while checking cluster health, verify that cluster is healthy"; exit 1; }
 [ -s ${TMPDIR}/health ] && { msg "The file: ${TMPDIR}/health is empty, try to check the output of the following command: ${etcdctl_bin} cluster-health"; exit 1; }
@@ -74,7 +75,7 @@ do
 done
 
 # Cluster node join as active member
-msg "Consistency checks passed. Now try effectively to join etcd2 cluster.";
+msg "Consistency checks passed."
 if [ "${dryrun}" == true ];
 then
     msg "DryRun was set. Printing commands that would be executed:"
@@ -83,6 +84,7 @@ then
     msg "rm -rf ${ETCD2DIR}/proxy";
     msg "${etcd2_bin} -listen-client-urls http://${PRIVATE_IPV4}:2379 -advertise-client-urls http://${PRIVATE_IPV4}:2379  -listen-peer-urls http://${PRIVATE_IPV4}:2380 -initial-advertise-peer-urls http://${PRIVATE_IPV4}:2380 -data-dir ${ETCD2DIR}";
 else
+    msg "Trying to join etcd2 cluster.";
     CLUDETAILS=$(${etcdctl_bin} member add ${MACHINEID} http://${PRIVATE_IPV4}:2380);
     [ $? -ne 0 ] && { msg "Adding member returned an error, system was modified. Remove the member if unhealthy: ${etcdctl_bin} member remove ${MACHINEID}"; exit 1; }
     ${systemctl_bin} stop etcd2.service
