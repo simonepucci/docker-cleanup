@@ -92,7 +92,7 @@ else
     ${ps_bin} ax | ${grep_bin} -v grep | ${grep_bin} -q "${etcd2_bin}" && { msg "Some errors happened while killing etcd2 proxy service: check it throught: ${systemctl_bin} status etcd2.service"; exit 1; }
     rm -rf ${ETCD2DIR}/proxy;
     eval export $(echo "${CLUDETAILS}" | tail -n-3);
-    ${etcd2_bin} -listen-client-urls http://${PRIVATE_IPV4}:2379 -advertise-client-urls http://${PRIVATE_IPV4}:2379  -listen-peer-urls http://${PRIVATE_IPV4}:2380 -initial-advertise-peer-urls http://${PRIVATE_IPV4}:2380 -data-dir ${ETCD2DIR} &
+    ${etcd2_bin} -listen-client-urls http://${PRIVATE_IPV4}:2379 -advertise-client-urls http://${PRIVATE_IPV4}:2379  -listen-peer-urls http://${PRIVATE_IPV4}:2380 -initial-advertise-peer-urls http://${PRIVATE_IPV4}:2380 -data-dir ${ETCD2DIR} &> /dev/null &
 fi
 msg "Check if the current node is now active member of the cluster running the following command on another node: etcdctl cluster-health, then reboot current node.";
 
