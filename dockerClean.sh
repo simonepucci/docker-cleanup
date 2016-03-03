@@ -45,5 +45,5 @@ msg "Running: cleanup obsolete logs of maintenace scripts.";
 msg "Running: extemporaneous commands only if /tmp/RUN exists";
 [ "${dryrun}" == true ] || ./docker-extra-commands.sh /tmp/RUN
 
-msg "Running docker bug check";
+msg "Running: docker bug check";
 [ "${dryrun}" == true ] || ./docker-bug-finder.sh
