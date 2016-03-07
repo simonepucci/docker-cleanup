@@ -7,6 +7,8 @@
 #DISCLAIMER    The current node must be already a proxy member of the 
 #DISCLAIMER      cluster in order to join as an active voting member.
 #DISCLAIMER    More Info at https://coreos.com/etcd/docs/latest/admin_guide.html
+#DISCLAIMER    If you need to manually remove a node from discovery url, do it via curl
+#DISCLAIMER        curl -sSL https://discovery.etcd.io/<DISCOVERYID>/<MEMBERID> -XDELETE
 #DISCLAIMER    Usage Options: [-nh ]
 #DISCLAIMER        -n: dry run: display only commands would be executed.
 #DISCLAIMER        -h: help: display usage and exit.
