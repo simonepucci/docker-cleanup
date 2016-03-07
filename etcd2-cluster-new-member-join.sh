@@ -54,7 +54,7 @@ ps_bin=$(which ps 2> /dev/null)
 rm -rf ${TMPDIR} || { msg "Error, can not delete folder: ${TMPDIR}, check permissions."; exit 255; }
 mkdir -p ${TMPDIR} || { msg "Error, can not create folder: ${TMPDIR}, check permissions."; exit 255; }
 # Verify existence of etcd2 media proxy folder
-[ -d ${ETCD2DIR}/proxy ] || { msg "Etcd2 Media/proxy dir is missing... The current node must be a proxy. Try exporting ETCDCTL_PEERS=http://node1:2379,http://node2:2379,..,http://nodeN:2379, then run again the script"; exit 1; }
+[ -d ${ETCD2DIR}/proxy ] || { msg "Etcd2 Media/proxy dir is missing... The current node must be a proxy. Try exporting ETCDCTL_PEERS=http://node1:2379,http://node2:2379,..,http://nodeN:2379, then run again the script in dry run mode, then follow printed instructions."; exit 1; }
 # Verify required environment variables are present
 MACHINEID=$(cat /etc/machine-id)
 [ -z "${MACHINEID}" ] && { msg "MachineId is empty, check the code... and the content of /etc/machine-id"; exit 1; }
@@ -62,7 +62,7 @@ PRIVATE_IPV4=$(${grep_bin} "COREOS_PRIVATE_IPV4" /etc/environment | ${grep_bin} 
 [ -z "${PRIVATE_IPV4}" ] && { msg "Some error occurred while reading PRIVATE_IPV4 from /etc/environment, check the code..."; exit 1; }
 # Verify current cluster has members
 ${etcdctl_bin} member list > ${TMPDIR}/list 2>/dev/null
-[ $? -ne 0 ] && { msg "Some error occurred while listing cluster members, verify that current host is already a proxy member of a healthy cluster. Try exporting ETCDCTL_PEERS=http://node1:2379,http://node2:2379,..,http://nodeN:2379, then run again the script"; exit 1; }
+[ $? -ne 0 ] && { msg "Some error occurred while listing cluster members, verify that current host is already a proxy member of a healthy cluster. Try exporting ETCDCTL_PEERS=http://node1:2379,http://node2:2379,..,http://nodeN:2379, then run again the script in dry run mode, then follow printed instructions."; exit 1; }
 [ -s ${TMPDIR}/list ] || { msg "The file: ${TMPDIR}/list is empty, try to check the output of the following command: ${etcdctl_bin} member list"; exit 1; }
 ${grep_bin} -q ${PRIVATE_IPV4} ${TMPDIR}/list && { msg "Current host is already a member of the cluster. Remove it and retry running this script."; exit 1; }
 
