@@ -74,6 +74,8 @@ EOF
     A cleaning unused docker images and volumes if overlay driver is used by docker
 ###   docker-cleanup-volumes.sh
     The original script used to clenup disk space if docker use VFS driver
+###   docker-cleanup-dangling-volumes.sh
+    A small cleanup script that clean orphaned volumes in one shot, it use built-in docker volume functionality added in version 1.9.0 and later
 ###   docker-cleanup-deisRouterLogs.sh
     Simply truncate nginx routers logfile
 ###   docker-extra-commands.sh
