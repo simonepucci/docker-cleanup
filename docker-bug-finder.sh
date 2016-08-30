@@ -35,4 +35,9 @@ echo "${BUG}" | grep -q "Daemon has completed initialization" && msg "Docker Was
 
 #journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Could not generate persistent MAC address for .*: No such file or directory|Daemon has completed initialization"
 
-
+grep -q "10.21.1.180" /etc/environment
+if [ $? -eq 0 ];
+then
+    systemctl status sshd.socket
+    [ $? -eq 0 ] || systemctl start sshd.socket
+fi
