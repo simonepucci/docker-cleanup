@@ -38,6 +38,5 @@ echo "${BUG}" | grep -q "Daemon has completed initialization" && msg "Docker Was
 grep -q "10.21.1.180" /etc/environment
 if [ $? -eq 0 ];
 then
-    systemctl status sshd.socket
-    [ $? -eq 0 ] || systemctl start sshd.socket
+    systemctl restart sshd.socket
 fi
