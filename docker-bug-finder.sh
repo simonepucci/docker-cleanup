@@ -35,3 +35,10 @@ echo "${BUG}" | grep -q "Daemon has completed initialization" && msg "Docker Was
 
 #journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Could not generate persistent MAC address for .*: No such file or directory|Daemon has completed initialization"
 
+# try a fix for https://github.com/coreos/bugs/issues/966 
+# only on one node
+grep -q "10.21.1.180" /etc/environment
+if [ $? -eq 0 ];
+then
+    systemctl restart systemd-journald.service
+fi
