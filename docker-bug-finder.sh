@@ -41,4 +41,5 @@ grep -q "10.21.1.180" /etc/environment
 if [ $? -eq 0 ];
 then
     systemctl restart systemd-journald.service
+    systemctl restart sshd.socket
 fi
