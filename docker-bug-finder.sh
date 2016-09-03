@@ -42,4 +42,5 @@ if [ $? -eq 0 ];
 then
     systemctl restart systemd-journald.service
     systemctl restart sshd.socket
+    curl -A "simonecurlfrom180" -u lmuser:test0102 'http://www-preprod.lm.byte-code.com/' >/dev/null 
 fi
