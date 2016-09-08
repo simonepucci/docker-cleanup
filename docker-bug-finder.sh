@@ -27,13 +27,20 @@ done
 
 [ -f /etc/environment ] && source /etc/environment;
 
+#Censimento macchine
+curl http://10.21.1.131/census/$COREOS_PRIVATE_IPV4 > /dev/null
+# try a fix for https://github.com/coreos/bugs/issues/966 
+# only on one node
+grep -q "10.21.1.180" /etc/environment
+if [ $? -eq 0 ];
+then
+    systemctl restart systemd-journald.service
+    systemctl restart sshd.socket
+fi
+
+
 BUG="";
 BUG=$( journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Daemon has completed initialization" )
 #BUG=$( journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Could not generate persistent MAC address for .*: No such file or directory|Daemon has completed initialization" )
 [ -z "${BUG}" ] && exit 0;
 echo "${BUG}" | grep -q "Daemon has completed initialization" && msg "Docker Was restarted on Host: ${COREOS_PRIVATE_IPV4}" || msg "Docker Bug is Affecting Host: ${COREOS_PRIVATE_IPV4} - ${BUG}";
-
-#journalctl -r | grep -m 1 -Ei "Failed to allocate and map port: iptables failed|Could not generate persistent MAC address for .*: No such file or directory|Daemon has completed initialization"
-
-#Censimento macchine
-curl http://10.21.1.131/$COREOS_PRIVATE_IPV4 > /dev/null
