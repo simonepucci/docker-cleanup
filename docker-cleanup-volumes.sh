@@ -25,6 +25,12 @@ allvolumes=()
 dryrun=false
 verbose=false
 
+DOCKERVERSION=$(${docker_bin} --version | grep -Eo '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}' | tr -d '.');
+if [ ${DOCKERVERSION} -gt 183 ]; then
+    msg "You can run this script only with older docker versions."
+    exit 1
+fi
+
 function log_verbose() {
     if [ "${verbose}" == true ]; then
         echo "$1"

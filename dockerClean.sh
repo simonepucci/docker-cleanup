@@ -30,11 +30,11 @@ done
 msg "Running: extemporaneous commands only if /tmp/RUNPRE exists";
 [ "${dryrun}" == true ] || ./docker-extra-commands.sh /tmp/RUNPRE
 
+msg "Running: cleanup volumes.";
+[ "${dryrun}" == true ] && ./docker-cleanup-volumes.sh --dry-run || ./docker-cleanup-volumes.sh
+
 msg "Running: clanup images and containers.";
 [ "${dryrun}" == true ] && ./docker-cleanup-images.sh -n || ./docker-cleanup-images.sh
-
-#msg "Running: cleanup volumes.";
-#[ "${dryrun}" == true ] && ./docker-cleanup-volumes.sh --dry-run || ./docker-cleanup-volumes.sh
 
 msg "Running: cleanup dangling volumes.";
 [ "${dryrun}" == true ] && ./docker-cleanup-dangling-volumes.sh -n || ./docker-cleanup-dangling-volumes.sh

@@ -33,6 +33,11 @@ if [ -z "$docker_bin" ] ; then
 fi
 
 #set -eou pipefail
+DOCKERVERSION=$(${docker_bin} --version | grep -Eo '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}' | tr -d '.');
+if [ ${DOCKERVERSION} -lt 190 ]; then
+    msg "You can run this script only with newer docker versions."
+    exit 1
+fi
 
 msg "Removing exited docker containers..."
 if [ "${dryrun}" == true ];
