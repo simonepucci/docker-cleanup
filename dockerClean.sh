@@ -50,3 +50,4 @@ msg "Running: extemporaneous commands only if /tmp/RUN exists";
 
 msg "Running: docker bug check";
 [ "${dryrun}" == true ] || ./docker-bug-finder.sh
+
