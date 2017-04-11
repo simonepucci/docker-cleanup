@@ -4,7 +4,7 @@
 #
 #
 #DISCLAIMER    Mantain discoveryurl aligned with current members
-#DISCLAIMER    The current node must be already a proxy or an active member of the 
+#DISCLAIMER    The current node must be already a proxy or an active member of the
 #DISCLAIMER      cluster in order to run this script successfully.
 #DISCLAIMER    More Info at https://coreos.com/etcd/docs/latest/admin_guide.html
 #DISCLAIMER    This script will print out curls that must be manually run.
@@ -41,8 +41,6 @@ etcdctl_bin=$(which etcdctl 2> /dev/null)
 [ -z "${etcdctl_bin}" ] && { msg "etcdctl command not found, can not run this script."; exit 255; }
 grep_bin=$(which grep 2> /dev/null)
 [ -z "${grep_bin}" ] && { msg "grep command not found, can not run this script."; exit 255; }
-cat_bin=$(which cat 2> /dev/null)
-[ -z "${cat_bin}" ] && { msg "cat command not found, can not run this script."; exit 255; }
 cut_bin=$(which cut 2> /dev/null)
 [ -z "${cut_bin}" ] && { msg "cut command not found, can not run this script."; exit 255; }
 curl_bin=$(which curl 2> /dev/null)
@@ -55,7 +53,7 @@ mkdir -p ${TMPDIR} || { msg "Error, can not create folder: ${TMPDIR}, check perm
 
 TMPDUCURRENT="${TMPDIR}/tduc.txt";
 TMPMLCURRENT="${TMPDIR}/tmlc.txt";
-DISCOVERYURL=$( ${systemctl_bin} ${cat_bin} etcd2.service | ${grep_bin} ETCD_DISCOVERY | ${grep_bin} -Eo 'https://discovery.etcd.io/.[0-9a-z]+'|${cut_bin} -d '/' -f 4 );
+DISCOVERYURL=$( ${systemctl_bin} cat etcd2.service | ${grep_bin} ETCD_DISCOVERY | ${grep_bin} -Eo 'https://discovery.etcd.io/.[0-9a-z]+'|${cut_bin} -d '/' -f 4 );
 
 ${curl_bin} https://discovery.etcd.io/${DISCOVERYURL} -o ${TMPDUCURRENT}
 
@@ -65,21 +63,18 @@ ${grep_bin} -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' ${TMPDUCURRENT} | while read ipadd
 do
     #Remove if not actually member
     ${grep_bin} -q ${ipaddress} ${TMPMLCURRENT};
-    if [ $? ne 0 ];
+    if [ $? -ne 0 ];
     then
         NODE=$( ${grep_bin} ${ipaddress} ${TMPDUCURRENT} | ${cut_bin} -d ':' -f 1 );
         echo "${curl_bin} https://discovery.etcd.io/${DISCOVERYURL}/${NODE} -XDELETE";
     fi
 done
 
-#rm -f ${TMPDUCURRENT};
-#curl https://discovery.etcd.io/${DISCOVERYURL} -o ${TMPDUCURRENT}
-
 ${grep_bin} -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' ${TMPMLCURRENT} | while read ipaddress;
 do
     #Add node if not present in DISCOVERYURL
     ${grep_bin} -q ${ipaddress} ${TMPDUCURRENT};
-    if [ $? ne 0 ];
+    if [ $? -ne 0 ];
     then
         NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
         LNODE=$( ${grep_bin} -Eo 'name=.[0-9a-z]+' ${TMPMLCURRENT} | ${cut_bin} -d '=' -f 2 );
