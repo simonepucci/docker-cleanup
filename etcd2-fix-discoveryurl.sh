@@ -80,8 +80,10 @@ do
     ${grep_bin} -q ${ipaddress} ${TMPDUCURRENT};
     if [ $? -ne 0 ];
     then
-        NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
-        LNODE=$( ${grep_bin} -Eo 'name=.[0-9a-z]+' ${TMPMLCURRENT} | ${cut_bin} -d '=' -f 2 );
+        #NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
+        #LNODE=$( ${grep_bin} -Eo 'name=.[0-9a-z]+' ${TMPMLCURRENT} | ${cut_bin} -d '=' -f 2 );
+	NODEID=$( grep ${ipaddress} ${TMPDUTXT} | awk '{print $1}' | cut -f '3' -d ',' | grep -o '[0-9]*' | sort -n | uniq );
+        LNODE=$(egrep "\[\"node\"\,\"nodes\"\,${NODEID}\,\"value\"\]" ${TMPDUTXT} | cut -f '6' -d '"');
 	echo "NODE=$NODE"
 	echo "LNODE=$LNODE"
 	echo "ipaddress=$ipaddress"
