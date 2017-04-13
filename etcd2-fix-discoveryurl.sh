@@ -47,6 +47,12 @@ cut_bin=$(which cut 2> /dev/null)
 [ -z "${cut_bin}" ] && { msg "cut command not found, can not run this script."; exit 255; }
 curl_bin=$(which curl 2> /dev/null)
 [ -z "${curl_bin}" ] && { msg "curl command not found, can not run this script."; exit 255; }
+awk_bin=$(which awk 2> /dev/null)
+[ -z "${awk_bin}" ] && { msg "awk command not found, can not run this script."; exit 255; }
+sort_bin=$(which sort 2> /dev/null)
+[ -z "${sort_bin}" ] && { msg "sort command not found, can not run this script."; exit 255; }
+uniq_bin=$(which uniq 2> /dev/null)
+[ -z "${uniq_bin}" ] && { msg "uniq command not found, can not run this script."; exit 255; }
 # Verify temp path is accessible
 [ -z "${TMPDIR}" ] && { msg "Error: TMPDIR var was unset, doublecheck the content of current script"; exit 255; }
 rm -rf ${TMPDIR} || { msg "Error, can not delete folder: ${TMPDIR}, check permissions."; exit 255; }
@@ -56,7 +62,7 @@ mkdir -p ${TMPDIR} || { msg "Error, can not create folder: ${TMPDIR}, check perm
 TMPDUCURRENT="${TMPDIR}/tduc.txt";
 TMPDUTXT="${TMPDIR}/tduc-json.txt";
 TMPMLCURRENT="${TMPDIR}/tmlc.txt";
-DISCOVERYURL=$( ${systemctl_bin} cat etcd2.service | ${grep_bin} ETCD_DISCOVERY | ${grep_bin} -Eo 'https://discovery.etcd.io/.[0-9a-z]+'|${cut_bin} -d '/' -f 4 );
+DISCOVERYURL=$( ${systemctl_bin} ${cat_bin} etcd2.service | ${grep_bin} ETCD_DISCOVERY | ${grep_bin} -Eo 'https://discovery.etcd.io/.[0-9a-z]+'|${cut_bin} -d '/' -f 4 );
 
 ${curl_bin} https://discovery.etcd.io/${DISCOVERYURL} -o ${TMPDUCURRENT};
 ${cat_bin} ${TMPDUCURRENT} | ./JSON.sh > ${TMPDUTXT};
@@ -68,8 +74,8 @@ do
     ${grep_bin} -q ${ipaddress} ${TMPMLCURRENT};
     if [ $? -ne 0 ];
     then
-	NODEID=$( grep ${ipaddress} ${TMPDUTXT} | awk '{print $1}' | cut -f '3' -d ',' | grep -o '[0-9]*' | sort -n | uniq );
-        NODE=$(egrep "\[\"node\"\,\"nodes\"\,${NODEID}\,\"key\"\]" ${TMPDUTXT} | cut -f '8' -d '"' | cut -d '/' -f 5);
+	NODEID=$( grep ${ipaddress} ${TMPDUTXT} | ${awk_bin} '{print $1}' | ${cut_bin} -f '3' -d ',' | ${grep_bin} -o '[0-9]*' | ${sort_bin} -n | ${uniq_bin} );
+        NODE=$( ${grep_bin} -E "\[\"node\"\,\"nodes\"\,${NODEID}\,\"key\"\]" ${TMPDUTXT} | ${cut_bin} -f '8' -d '"' | ${cut_bin} -d '/' -f 5);
         echo "${curl_bin} https://discovery.etcd.io/${DISCOVERYURL}/${NODE} -XDELETE";
     fi
 done
@@ -81,8 +87,8 @@ do
     if [ $? -ne 0 ];
     then
         NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
-	NODEID=$( grep ${ipaddress} ${TMPDUTXT} | awk '{print $1}' | cut -f '3' -d ',' | grep -o '[0-9]*' | sort -n | uniq );
-        LNODE=$(egrep "\[\"node\"\,\"nodes\"\,${NODEID}\,\"value\"\]" ${TMPDUTXT} | cut -f '8' -d '"');
+	NODEID=$( ${grep_bin} ${ipaddress} ${TMPDUTXT} | ${awk_bin} '{print $1}' | ${cut_bin} -f '3' -d ',' | ${grep_bin} -o '[0-9]*' | ${sort_bin} -n | ${uniq_bin} );
+        LNODE=$( ${grep_bin} -E "\[\"node\"\,\"nodes\"\,${NODEID}\,\"value\"\]" ${TMPDUTXT} | ${cut_bin} -f '8' -d '"');
         echo "${curl_bin} -H \"Content-Type: application/json\" -XPUT -sSL \"https://discovery.etcd.io/${DISCOVERYURL}/${NODE}?value=${LNODE}\"";
     fi
 done
