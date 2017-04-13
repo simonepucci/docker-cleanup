@@ -80,7 +80,7 @@ do
     fi
 done
 
-${grep_bin} -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' ${TMPMLCURRENT} | while read ipaddress;
+${grep_bin} -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' ${TMPMLCURRENT} | ${sort_bin} | ${uniq_bin} | while read ipaddress;
 do
     #Add node if not present in DISCOVERYURL
     ${grep_bin} -q ${ipaddress} ${TMPDUCURRENT};
