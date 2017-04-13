@@ -82,8 +82,11 @@ do
     then
         NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
         LNODE=$( ${grep_bin} -Eo 'name=.[0-9a-z]+' ${TMPMLCURRENT} | ${cut_bin} -d '=' -f 2 );
-        echo "${curl_bin} -H \"Content-Type: application/json\" -XPUT -sSL \"https://discovery.etcd.io/${DISCOVERYURL}/${NODE}?value=${LNODE}=http://${ipaddress}:2380\"";
+	echo "NODE=$NODE"
+	echo "LNODE=$LNODE"
+	echo "ipaddress=$ipaddress"
+#        echo "${curl_bin} -H \"Content-Type: application/json\" -XPUT -sSL \"https://discovery.etcd.io/${DISCOVERYURL}/${NODE}?value=${LNODE}=http://${ipaddress}:2380\"";
     fi
 done
 
-rm -f ${TMPDUCURRENT} ${TMPMLCURRENT}
+rm -rf ${TMPDIR}
