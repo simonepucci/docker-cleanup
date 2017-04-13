@@ -64,7 +64,7 @@ TMPDUTXT="${TMPDIR}/tduc-json.txt";
 TMPMLCURRENT="${TMPDIR}/tmlc.txt";
 DISCOVERYURL=$( ${systemctl_bin} cat etcd2.service | ${grep_bin} ETCD_DISCOVERY | ${grep_bin} -Eo 'https://discovery.etcd.io/.[0-9a-z]+'|${cut_bin} -d '/' -f 4 );
 
-${curl_bin} https://discovery.etcd.io/${DISCOVERYURL} -o ${TMPDUCURRENT};
+${curl_bin} https://discovery.etcd.io/${DISCOVERYURL} -o ${TMPDUCURRENT} 2>/dev/null;
 ${cat_bin} ${TMPDUCURRENT} | ./JSON.sh > ${TMPDUTXT};
 ${etcdctl_bin} member list > ${TMPMLCURRENT};
 
