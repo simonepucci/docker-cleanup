@@ -75,7 +75,7 @@ do
     if [ $? -ne 0 ];
     then
 	NODEID=$( grep ${ipaddress} ${TMPDUTXT} | ${awk_bin} '{print $1}' | ${cut_bin} -f '3' -d ',' | ${grep_bin} -o '[0-9]*' | ${sort_bin} -n | ${uniq_bin} );
-        NODE=$( ${grep_bin} -E "\[\"node\"\,\"nodes\"\,${NODEID}\,\"key\"\]" ${TMPDUTXT} | ${cut_bin} -f '8' -d '"' | ${cut_bin} -d '/' -f 5);
+        NODE=$( ${grep_bin} -E "\[\"node\"\,\"nodes\"\,${NODEID}\,\"key\"\]" ${TMPDUTXT} | ${cut_bin} -f '8' -d '"' | ${cut_bin} -d '/' -f 5 );
         echo "${curl_bin} https://discovery.etcd.io/${DISCOVERYURL}/${NODE} -XDELETE";
     fi
 done
@@ -88,8 +88,8 @@ do
     then
         NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
 	NODEID=$( ${grep_bin} ${ipaddress} ${TMPDUTXT} | ${awk_bin} '{print $1}' | ${cut_bin} -f '3' -d ',' | ${grep_bin} -o '[0-9]*' | ${sort_bin} -n | ${uniq_bin} );
-        LNODE=$( ${grep_bin} -E "\[\"node\"\,\"nodes\"\,${NODEID}\,\"value\"\]" ${TMPDUTXT} | ${cut_bin} -f '8' -d '"');
-        echo "${curl_bin} -H \"Content-Type: application/json\" -XPUT -sSL \"https://discovery.etcd.io/${DISCOVERYURL}/${NODE}?value=${LNODE}\"";
+        LNODE=$( ${grep_bin} -E "\[\"node\"\,\"nodes\"\,${NODEID}\,\"value\"\]" ${TMPDUTXT} | ${cut_bin} -f '8' -d '"' );
+        [ -z "${LNODE}" ] || echo "${curl_bin} -H \"Content-Type: application/json\" -XPUT -sSL \"https://discovery.etcd.io/${DISCOVERYURL}/${NODE}?value=${LNODE}\"";
     fi
 done
 
