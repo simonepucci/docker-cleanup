@@ -80,14 +80,10 @@ do
     ${grep_bin} -q ${ipaddress} ${TMPDUCURRENT};
     if [ $? -ne 0 ];
     then
-        #NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
-        #LNODE=$( ${grep_bin} -Eo 'name=.[0-9a-z]+' ${TMPMLCURRENT} | ${cut_bin} -d '=' -f 2 );
+        NODE=$( ${grep_bin} ${ipaddress} ${TMPMLCURRENT} | ${cut_bin} -d ':' -f 1 );
 	NODEID=$( grep ${ipaddress} ${TMPDUTXT} | awk '{print $1}' | cut -f '3' -d ',' | grep -o '[0-9]*' | sort -n | uniq );
-        LNODE=$(egrep "\[\"node\"\,\"nodes\"\,${NODEID}\,\"value\"\]" ${TMPDUTXT} | cut -f '6' -d '"');
-	echo "NODE=$NODE"
-	echo "LNODE=$LNODE"
-	echo "ipaddress=$ipaddress"
-#        echo "${curl_bin} -H \"Content-Type: application/json\" -XPUT -sSL \"https://discovery.etcd.io/${DISCOVERYURL}/${NODE}?value=${LNODE}=http://${ipaddress}:2380\"";
+        LNODE=$(egrep "\[\"node\"\,\"nodes\"\,${NODEID}\,\"value\"\]" ${TMPDUTXT} | cut -f '8' -d '"');
+        echo "${curl_bin} -H \"Content-Type: application/json\" -XPUT -sSL \"https://discovery.etcd.io/${DISCOVERYURL}/${NODE}?value=${LNODE}\"";
     fi
 done
 
