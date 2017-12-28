@@ -97,4 +97,4 @@ do
     fi
 done
 
-#rm -rf ${TMPDIR}
+rm -rf ${TMPDIR}
